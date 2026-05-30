@@ -1,0 +1,425 @@
+<template>
+    <div class="gp-dashboard">
+
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Grand Praetor Dashboard</h1>
+            <p class="dashboard-subtitle">Chapter Overview</p>
+        </div>
+
+        <!-- Debug bar -->
+        <div class="debug-bar">
+            <strong>Debug:</strong> {debugMessage}
+        </div>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="loading-container">
+                <lightning-spinner alternative-text="Loading..." size="large"></lightning-spinner>
+                <p class="loading-text">Loading your chapters...</p>
+            </div>
+        </template>
+
+        <!-- Error -->
+        <template if:true={hasError}>
+            <div class="error-container">
+                <lightning-icon icon-name="utility:error" variant="error" size="medium"></lightning-icon>
+                <p class="error-message">{errorMessage}</p>
+            </div>
+        </template>
+
+        <!-- No Chapters -->
+        <template if:true={hasNoChapters}>
+            <div class="empty-container">
+                <lightning-icon icon-name="utility:info" variant="warning" size="medium"></lightning-icon>
+                <p class="empty-message">No active Grand Praetor positions found for your account.</p>
+            </div>
+        </template>
+
+        <!-- Chapter Cards -->
+        <template if:true={hasChapters}>
+            <div class="chapter-grid">
+                <template for:each={dashboardData} for:item="chapter">
+                    <div key={chapter.chapterId} class="chapter-card">
+
+                        <!-- Chapter Header -->
+                        <div class="chapter-card-header">
+                            <div class="chapter-title-row">
+                                <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+                                <div class="chapter-title-block">
+                                    <h2 class="chapter-name">{chapter.chapterName}</h2>
+                                    <template if:true={chapter.schoolName}>
+                                        <span class="school-name">{chapter.schoolName}</span>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="chapter-header-meta">
+                                <template if:true={chapter.formattedFoundingDate}>
+                                    <span class="header-meta-item">
+                                        <lightning-icon icon-name="utility:date_time" size="xx-small" class="header-meta-icon"></lightning-icon>
+                                        Founded: {chapter.formattedFoundingDate}
+                                    </span>
+                                </template>
+                                <template if:true={chapter.chapterAddress}>
+                                    <span class="header-meta-item">
+                                        <lightning-icon icon-name="utility:location" size="xx-small" class="header-meta-icon"></lightning-icon>
+                                        {chapter.chapterAddress}
+                                    </span>
+                                </template>
+                            </div>
+                            <div class="chapter-meta">
+                                <span class="meta-badge status-active">{chapter.positionStatus}</span>
+                            </div>
+                        </div>
+
+                        <!-- ── UNDERGRAD CHAPTER ── -->
+                        <template if:false={chapter.isAlumniChapter}>
+                            <div class="stats-row stats-five">
+                                <div class="stat-box stat-alumni">
+                                    <span class="stat-number">{chapter.alumniCount}</span>
+                                    <span class="stat-label">Alumni</span>
+                                </div>
+                                <div class="stat-box stat-undergrad">
+                                    <span class="stat-number">{chapter.undergradCount}</span>
+                                    <span class="stat-label">Undergrads</span>
+                                </div>
+                                <div class="stat-box stat-pledge">
+                                    <span class="stat-number">{chapter.pledgeCount}</span>
+                                    <span class="stat-label">Pledges</span>
+                                </div>
+                                <div class="stat-box stat-pnm">
+                                    <span class="stat-number">{chapter.pnmCount}</span>
+                                    <span class="stat-label">PNMs</span>
+                                </div>
+                                <div class="stat-box stat-associate">
+                                    <span class="stat-number">{chapter.associateCount}</span>
+                                    <span class="stat-label">Associates</span>
+                                </div>
+                            </div>
+
+                            <div class="three-col-section">
+
+                                <!-- Officers -->
+                                <div class="panel">
+                                    <div class="panel-header">
+                                        <div class="panel-header-left">
+                                            <lightning-icon icon-name="standard:user" size="x-small"></lightning-icon>
+                                            <h3 class="panel-title">Chapter Officers</h3>
+                                        </div>
+                                        <template if:true={chapter.hasOfficerEmails}>
+                                            <a href={chapter.officerMailtoLink} class="email-all-btn">
+                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                <span>Email All</span>
+                                            </a>
+                                        </template>
+                                    </div>
+                                    <template if:true={chapter.hasOfficers}>
+                                        <div class="scroll-list">
+                                            <template for:each={chapter.chapterOfficers} for:item="officer">
+                                                <div key={officer.positionId} class="list-row">
+                                                    <div class="row-info">
+                                                        <button
+                                                            class="contact-link"
+                                                            data-contactid={officer.contactId}
+                                                            onclick={handleContactClick}>
+                                                            {officer.officerName}
+                                                        </button>
+                                                        <span class="row-sub red">{officer.role}</span>
+                                                    </div>
+                                                    <template if:true={officer.emailLink}>
+                                                        <a href={officer.emailLink} class="row-email-btn" title={officer.email}>
+                                                            <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:false={chapter.hasOfficers}>
+                                        <p class="no-data-message">No active officers found.</p>
+                                    </template>
+                                </div>
+
+                                <!-- Undergrads -->
+                                <div class="panel">
+                                    <div class="panel-header">
+                                        <div class="panel-header-left">
+                                            <lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+                                            <h3 class="panel-title">Undergrads</h3>
+                                            <span class="panel-count">({chapter.undergradCount})</span>
+                                        </div>
+                                        <template if:true={chapter.hasUndergradEmails}>
+                                            <a href={chapter.undergradMailtoLink} class="email-all-btn">
+                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                <span>Email All</span>
+                                            </a>
+                                        </template>
+                                    </div>
+                                    <template if:true={chapter.hasUndergrads}>
+                                        <div class="scroll-list">
+                                            <template for:each={chapter.activeUndergrads} for:item="member">
+                                                <div key={member.memberId} class="list-row">
+                                                    <div class="row-info">
+                                                        <button
+                                                            class="contact-link"
+                                                            data-contactid={member.contactId}
+                                                            onclick={handleContactClick}>
+                                                            {member.memberName}
+                                                        </button>
+                                                        <template if:true={member.formattedInitDate}>
+                                                            <span class="row-sub">Initiated: {member.formattedInitDate}</span>
+                                                        </template>
+                                                        <template if:false={member.formattedInitDate}>
+                                                            <template if:true={member.formattedPledgeDate}>
+                                                                <span class="row-sub">Pledged: {member.formattedPledgeDate}</span>
+                                                            </template>
+                                                        </template>
+                                                    </div>
+                                                    <template if:true={member.emailLink}>
+                                                        <a href={member.emailLink} class="row-email-btn" title={member.email}>
+                                                            <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:false={chapter.hasUndergrads}>
+                                        <p class="no-data-message">No active undergrads found.</p>
+                                    </template>
+                                </div>
+
+                                <!-- Pledges -->
+                                <div class="panel">
+                                    <div class="panel-header">
+                                        <div class="panel-header-left">
+                                            <lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+                                            <h3 class="panel-title">Pledges</h3>
+                                            <span class="panel-count">({chapter.pledgeCount})</span>
+                                        </div>
+                                        <template if:true={chapter.hasPledgeEmails}>
+                                            <a href={chapter.pledgeMailtoLink} class="email-all-btn">
+                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                <span>Email All</span>
+                                            </a>
+                                        </template>
+                                    </div>
+                                    <template if:true={chapter.hasPledges}>
+                                        <div class="scroll-list">
+                                            <template for:each={chapter.activePledges} for:item="member">
+                                                <div key={member.memberId} class="list-row">
+                                                    <div class="row-info">
+                                                        <button
+                                                            class="contact-link"
+                                                            data-contactid={member.contactId}
+                                                            onclick={handleContactClick}>
+                                                            {member.memberName}
+                                                        </button>
+                                                        <template if:true={member.formattedPledgeDate}>
+                                                            <span class="row-sub">Pledged: {member.formattedPledgeDate}</span>
+                                                        </template>
+                                                    </div>
+                                                    <template if:true={member.emailLink}>
+                                                        <a href={member.emailLink} class="row-email-btn" title={member.email}>
+                                                            <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:false={chapter.hasPledges}>
+                                        <p class="no-data-message">No active pledges found.</p>
+                                    </template>
+                                </div>
+
+                            </div>
+                        </template>
+
+                        <!-- ── ALUMNI / PROVINCE CHAPTER ── -->
+                        <template if:true={chapter.isAlumniChapter}>
+                            <div class="stats-row stats-one">
+                                <div class="stat-box stat-alumni">
+                                    <span class="stat-number">{chapter.totalMemberCount}</span>
+                                    <span class="stat-label">Members</span>
+                                </div>
+                            </div>
+                            <div class="two-col-section">
+                                <div class="panel">
+                                    <div class="panel-header">
+                                        <div class="panel-header-left">
+                                            <lightning-icon icon-name="standard:user" size="x-small"></lightning-icon>
+                                            <h3 class="panel-title">Chapter Officers</h3>
+                                        </div>
+                                        <template if:true={chapter.hasOfficerEmails}>
+                                            <a href={chapter.officerMailtoLink} class="email-all-btn">
+                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                <span>Email All</span>
+                                            </a>
+                                        </template>
+                                    </div>
+                                    <template if:true={chapter.hasOfficers}>
+                                        <div class="scroll-list">
+                                            <template for:each={chapter.chapterOfficers} for:item="officer">
+                                                <div key={officer.positionId} class="list-row">
+                                                    <div class="row-info">
+                                                        <button
+                                                            class="contact-link"
+                                                            data-contactid={officer.contactId}
+                                                            onclick={handleContactClick}>
+                                                            {officer.officerName}
+                                                        </button>
+                                                        <span class="row-sub red">{officer.role}</span>
+                                                    </div>
+                                                    <template if:true={officer.emailLink}>
+                                                        <a href={officer.emailLink} class="row-email-btn" title={officer.email}>
+                                                            <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:false={chapter.hasOfficers}>
+                                        <p class="no-data-message">No active officers found.</p>
+                                    </template>
+                                </div>
+
+                                <div class="panel">
+                                    <div class="panel-header">
+                                        <div class="panel-header-left">
+                                            <lightning-icon icon-name="standard:contact" size="x-small"></lightning-icon>
+                                            <h3 class="panel-title">Members</h3>
+                                            <span class="panel-count">({chapter.totalMemberCount})</span>
+                                        </div>
+                                        <template if:true={chapter.hasMemberEmails}>
+                                            <a href={chapter.memberMailtoLink} class="email-all-btn">
+                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                <span>Email All</span>
+                                            </a>
+                                        </template>
+                                    </div>
+                                    <template if:true={chapter.hasMembers}>
+                                        <div class="scroll-list">
+                                            <template for:each={chapter.activeMembers} for:item="member">
+                                                <div key={member.memberId} class="list-row">
+                                                    <div class="row-info">
+                                                        <button
+                                                            class="contact-link"
+                                                            data-contactid={member.contactId}
+                                                            onclick={handleContactClick}>
+                                                            {member.memberName}
+                                                        </button>
+                                                        <template if:true={member.memberType}>
+                                                            <span class="row-sub">{member.memberType}</span>
+                                                        </template>
+                                                    </div>
+                                                    <template if:true={member.emailLink}>
+                                                        <a href={member.emailLink} class="row-email-btn" title={member.email}>
+                                                            <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:false={chapter.hasMembers}>
+                                        <p class="no-data-message">No active members found.</p>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- ── CONTACT MODAL ── -->
+        <template if:true={showModal}>
+            <div class="modal-backdrop" onclick={closeModal}></div>
+            <div class="modal-container" role="dialog" aria-modal="true">
+                <div class="modal-header">
+                    <div class="modal-header-left">
+                        <lightning-icon icon-name="standard:contact" size="small"></lightning-icon>
+                        <h2 class="modal-title">{modalTitle}</h2>
+                    </div>
+                    <button class="modal-close" onclick={closeModal} title="Close">
+                        <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <template if:true={modalLoading}>
+                        <div class="modal-loading">
+                            <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+
+                    <template if:false={modalLoading}>
+                        <template if:true={modalContact}>
+
+                            <!-- Phone -->
+                            <template if:true={modalContact.hasPhone}>
+                                <div class="modal-row">
+                                    <lightning-icon icon-name="utility:phone_portrait" size="x-small" class="modal-icon"></lightning-icon>
+                                    <div class="modal-row-content">
+                                        <span class="modal-label">Phone</span>
+                                        <a href={modalPhoneLink} class="modal-value">{modalContact.displayPhone}</a>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Mobile (if different from phone) -->
+                            <template if:true={modalContact.showMobile}>
+                                <div class="modal-row">
+                                    <lightning-icon icon-name="utility:phone_portrait" size="x-small" class="modal-icon"></lightning-icon>
+                                    <div class="modal-row-content">
+                                        <span class="modal-label">Mobile</span>
+                                        <a href={modalMobileLink} class="modal-value">{modalContact.mobilePhone}</a>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Email -->
+                            <template if:true={modalContact.hasEmail}>
+                                <div class="modal-row">
+                                    <lightning-icon icon-name="utility:email" size="x-small" class="modal-icon"></lightning-icon>
+                                    <div class="modal-row-content">
+                                        <span class="modal-label">Email</span>
+                                        <a href={modalEmailLink} class="modal-value">{modalContact.displayEmail}</a>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Address -->
+                            <template if:true={modalContact.hasAddress}>
+                                <div class="modal-row">
+                                    <lightning-icon icon-name="utility:location" size="x-small" class="modal-icon"></lightning-icon>
+                                    <div class="modal-row-content">
+                                        <span class="modal-label">Address</span>
+                                        <span class="modal-value">{modalContact.address}</span>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- No data -->
+                            <template if:false={modalContact.hasPhone}>
+                                <template if:false={modalContact.hasEmail}>
+                                    <template if:false={modalContact.hasAddress}>
+                                        <p class="no-data-message">No contact details available.</p>
+                                    </template>
+                                </template>
+                            </template>
+
+                        </template>
+                        <template if:false={modalContact}>
+                            <p class="no-data-message">Could not load contact details.</p>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+    </div>
+</template>

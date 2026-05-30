@@ -1,0 +1,428 @@
+/* ── Dashboard Shell ── */
+.gp-dashboard {
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+    padding: 1.5rem;
+    background: #f4f6f9;
+    min-height: 100vh;
+}
+
+/* ── Header ── */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #003087 0%, #C5A028 100%);
+    border-radius: 12px;
+    color: #ffffff;
+}
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: #ffffff;
+}
+.dashboard-subtitle {
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.85;
+}
+
+/* ── Debug bar ── */
+.debug-bar {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: #333;
+}
+
+/* ── Loading / Error / Empty ── */
+.loading-container, .error-container, .empty-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+}
+.loading-text, .error-message, .empty-message {
+    font-size: 1rem;
+    color: #5a6a7a;
+    text-align: center;
+}
+
+/* ── Chapter Grid ── */
+.chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(560px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ── Chapter Card ── */
+.chapter-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid #e0e5eb;
+}
+
+/* ── Chapter Card Header ── */
+.chapter-card-header {
+    background: linear-gradient(135deg, #1a2e4a 0%, #243d5c 100%);
+    padding: 1.25rem 1.5rem;
+    color: #ffffff;
+}
+.chapter-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+.chapter-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.chapter-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+    line-height: 1.2;
+}
+.school-name {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.75);
+    font-style: italic;
+}
+.chapter-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.meta-badge {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.15);
+    color: #ffffff;
+}
+.status-active { background: rgba(39,174,96,0.75); }
+
+/* ── Stats Row ── */
+.stats-row {
+    display: grid;
+    border-bottom: 1px solid #e0e5eb;
+}
+.stats-five { grid-template-columns: repeat(5, 1fr); }
+.stats-one  { grid-template-columns: 1fr; }
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 0.25rem;
+    border-right: 1px solid #e0e5eb;
+}
+.stat-box:last-child { border-right: none; }
+.stat-number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.stat-label {
+    font-size: 0.65rem;
+    color: #5a6a7a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.2rem;
+    text-align: center;
+}
+.stat-alumni .stat-number    { color: #1a2e4a; }
+.stat-undergrad .stat-number { color: #1a7f4b; }
+.stat-pledge .stat-number    { color: #c8102e; }
+.stat-pnm .stat-number       { color: #e67e22; }
+.stat-associate .stat-number { color: #7b5ea7; }
+
+/* ── Column Sections ── */
+.three-col-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.two-col-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+/* ── Panel ── */
+.panel {
+    padding: 1rem 1.25rem;
+    border-right: 1px solid #e0e5eb;
+    min-width: 0;
+}
+.panel:last-child { border-right: none; }
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f0f2f5;
+    gap: 0.25rem;
+}
+.panel-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+}
+.panel-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1a2e4a;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+.panel-count {
+    font-size: 0.75rem;
+    color: #7a8a9a;
+}
+
+/* ── Email All Button ── */
+.email-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: #1a2e4a;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.email-all-btn:hover {
+    background: #c8102e;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* ── Scrollable List ── */
+.scroll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 280px;
+    overflow-y: auto;
+}
+.list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.5rem;
+    border-radius: 6px;
+    background: #f8f9fb;
+    gap: 0.25rem;
+}
+.list-row:hover { background: #eef1f6; }
+
+.row-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+.row-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1a2e4a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.row-sub {
+    font-size: 0.7rem;
+    color: #5a6a7a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.row-sub.red { color: #c8102e; font-weight: 500; }
+
+.row-email-btn {
+    color: #0070d2;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+.row-email-btn:hover { color: #c8102e; }
+
+.no-data-message {
+    font-size: 0.78rem;
+    color: #9aa5b4;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 800px) {
+    .chapter-grid { grid-template-columns: 1fr; }
+    .three-col-section { grid-template-columns: 1fr; }
+    .two-col-section { grid-template-columns: 1fr; }
+    .panel { border-right: none; border-bottom: 1px solid #e0e5eb; }
+    .stats-five { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── Contact Name Button ── */
+.contact-link {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #003087;
+    text-align: left;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+.contact-link:hover { color: #C5A028; }
+
+/* ── Modal Backdrop ── */
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+/* ── Modal Container ── */
+.modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    width: 380px;
+    max-width: 90vw;
+    z-index: 1001;
+    overflow: hidden;
+}
+
+/* ── Modal Header ── */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, #1a2e4a 0%, #243d5c 100%);
+    color: #ffffff;
+}
+.modal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+}
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    padding: 0.25rem;
+    border-radius: 4px;
+    opacity: 0.8;
+}
+.modal-close:hover { opacity: 1; background: rgba(255,255,255,0.15); }
+
+/* ── Modal Body ── */
+.modal-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.modal-loading {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* ── Modal Row ── */
+.modal-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background: #f8f9fb;
+    border-radius: 8px;
+}
+.modal-icon { flex-shrink: 0; margin-top: 0.15rem; }
+.modal-row-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+.modal-label {
+    font-size: 0.68rem;
+    color: #7a8a9a;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+.modal-value {
+    font-size: 0.85rem;
+    color: #1a2e4a;
+    font-weight: 500;
+    word-break: break-word;
+    text-decoration: none;
+}
+a.modal-value:hover { color: #003087; text-decoration: underline; }
+
+/* ── Chapter Header Meta (founding date + address) ── */
+.chapter-header-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+.header-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.82);
+}
+.header-meta-icon {
+    flex-shrink: 0;
+    opacity: 0.85;
+}
