@@ -70,9 +70,46 @@
                             <div class="chapter-meta">
                                 <span class="meta-badge status-active">{chapter.positionStatus}</span>
                                 <template if:true={chapter.hasBalance}>
-                                    <span class="meta-badge balance-badge">{chapter.formattedBalance} due</span>
+                                    <span class="meta-badge balance-badge">{chapter.formattedBalance} total due</span>
                                 </template>
                             </div>
+                            <template if:true={chapter.hasBalance}>
+                                <div class="aging-buckets">
+                                    <div class="aging-bucket bucket-clickable"
+                                         data-chapter={chapter.chapterId}
+                                         data-bucket="0-30"
+                                         onclick={handleBucketClick}>
+                                        <span class="aging-label">0-30 Days</span>
+                                        <span class="aging-amount">{chapter.formatted0to30}</span>
+                                        <span class="bucket-hint">tap to view</span>
+                                    </div>
+                                    <div class="aging-bucket bucket-clickable"
+                                         data-chapter={chapter.chapterId}
+                                         data-bucket="31-60"
+                                         onclick={handleBucketClick}>
+                                        <span class="aging-label">31-60 Days</span>
+                                        <span class="aging-amount">{chapter.formatted31to60}</span>
+                                        <span class="bucket-hint">tap to view</span>
+                                    </div>
+                                    <div class="aging-bucket bucket-clickable"
+                                         data-chapter={chapter.chapterId}
+                                         data-bucket="61-90"
+                                         onclick={handleBucketClick}>
+                                        <span class="aging-label">61-90 Days</span>
+                                        <span class="aging-amount">{chapter.formatted61to90}</span>
+                                        <span class="bucket-hint">tap to view</span>
+                                    </div>
+                                    <div class="aging-bucket aging-bucket-red bucket-clickable"
+                                         data-chapter={chapter.chapterId}
+                                         data-bucket="90+"
+                                         onclick={handleBucketClick}>
+                                        <span class="aging-label">90+ Days</span>
+                                        <span class="aging-amount">{chapter.formatted90Plus}</span>
+                                        <span class="bucket-hint">tap to view</span>
+                                    </div>
+                                </div>
+                            </template>
+
                         </div>
 
                         <!-- ── UNDERGRAD CHAPTER ── -->
@@ -355,7 +392,11 @@
                     <p class="alert-intro">The following chapters have balances that are <strong>90+ days past due</strong>. Please contact them immediately.</p>
                     <div class="alert-chapter-list">
                         <template for:each={alertChapters} for:item="chapter">
-                            <div key={chapter.chapterId} class="alert-chapter-row">
+                            <div key={chapter.chapterId}
+                                 class="alert-chapter-row alert-chapter-clickable"
+                                 data-chapter={chapter.chapterId}
+                                 data-bucket="90+"
+                                 onclick={handleAlertChapterClick}>
                                 <div class="alert-chapter-info">
                                     <span class="alert-chapter-name">{chapter.chapterName}</span>
                                     <span class="alert-chapter-school">{chapter.schoolName}</span>
@@ -363,10 +404,71 @@
                                 <div class="alert-chapter-balance">
                                     <span class="alert-amount">{chapter.formattedBalance}</span>
                                     <span class="alert-age">{chapter.maxPostedAge} days</span>
+                                    <span class="alert-view-hint">tap to view</span>
                                 </div>
                             </div>
                         </template>
                     </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- ── ORDER LINES MODAL ── -->
+        <template if:true={showLinesModal}>
+            <div class="modal-backdrop" onclick={closeLinesModal}></div>
+            <div class="modal-container lines-modal-container" role="dialog" aria-modal="true">
+                <div class="modal-header lines-modal-header">
+                    <div class="modal-header-left">
+                        <lightning-icon icon-name="utility:currency" size="small" variant="inverse"></lightning-icon>
+                        <h2 class="modal-title">{linesModalTitle}</h2>
+                    </div>
+                    <button class="modal-close" onclick={closeLinesModal} title="Close">
+                        <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                    </button>
+                </div>
+                <div class="modal-body lines-modal-body">
+                    <template if:true={linesModalLoading}>
+                        <div class="modal-loading">
+                            <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+                    <template if:true={linesModalEmpty}>
+                        <p class="no-data-message">No order lines found for this period.</p>
+                    </template>
+                    <template if:true={linesModalHasLines}>
+                        <div class="lines-table-wrap">
+                            <table class="lines-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order #</th>
+                                        <th>Contact</th>
+                                        <th>Item</th>
+                                        <th>Posted</th>
+                                        <th>Due</th>
+                                        <th class="col-right">Qty</th>
+                                        <th class="col-right">Total</th>
+                                        <th class="col-right">Paid</th>
+                                        <th class="col-right">Balance Due</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={linesModalLines} for:item="line">
+                                        <tr key={line.lineKey}>
+                                            <td class="col-order">{line.salesOrderName}</td>
+                                            <td>{line.contactName}</td>
+                                            <td>{line.itemName}</td>
+                                            <td class="col-date">{line.postedDateFormatted}</td>
+                                            <td class="col-date">{line.dueDateFormatted}</td>
+                                            <td class="col-right">{line.quantity}</td>
+                                            <td class="col-right">{line.totalFormatted}</td>
+                                            <td class="col-right col-paid">{line.amountPaidFormatted}</td>
+                                            <td class="col-right col-balance">{line.balanceDueFormatted}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
                 </div>
             </div>
         </template>

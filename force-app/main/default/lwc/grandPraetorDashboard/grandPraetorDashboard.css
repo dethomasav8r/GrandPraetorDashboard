@@ -512,3 +512,149 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
     font-size: 0.72rem;
     color: #7a8a9a;
 }
+
+/* ── Aging Buckets in Banner ── */
+.aging-buckets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+.aging-bucket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 0.3rem 0.4rem;
+}
+.aging-bucket-red {
+    background: rgba(200,16,46,0.4);
+}
+.aging-label {
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+.aging-amount {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 0.1rem;
+}
+
+/* ── Clickable bucket ── */
+.bucket-clickable {
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.bucket-clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.bucket-hint {
+    font-size: 0.58rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 0.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* ── Detail Panel ── */
+.detail-panel {
+    border-top: 2px solid #C5A028;
+    background: #f8f9fc;
+    padding: 1rem 1.25rem;
+}
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+.detail-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a2e4a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.detail-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #5a6a7a;
+    line-height: 1;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}
+.detail-close:hover { background: #e0e5eb; color: #c8102e; }
+.detail-loading { display: flex; justify-content: center; padding: 1.5rem; }
+
+/* ── Lines Table ── */
+.lines-table-wrap { overflow-x: auto; }
+.lines-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+.lines-table th {
+    background: #003087;
+    color: #ffffff;
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+.lines-table td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid #e0e5eb;
+    color: #1a2e4a;
+    vertical-align: top;
+}
+.lines-table tr:hover td { background: #f0f4f8; }
+.col-right { text-align: right; }
+.col-order { font-weight: 600; white-space: nowrap; }
+.col-date  { white-space: nowrap; color: #5a6a7a; }
+.col-balance { font-weight: 700; color: #c8102e; }
+
+/* ── Lines Modal ── */
+.lines-modal-container {
+    width: 90vw;
+    max-width: 1000px;
+}
+.lines-modal-header {
+    background: linear-gradient(135deg, #003087 0%, #1a5276 100%);
+}
+.lines-modal-body {
+    padding: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.col-paid { color: #1a7f4b; font-weight: 600; }
+
+/* ── Alert clickable rows ── */
+.alert-chapter-clickable {
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.alert-chapter-clickable:hover {
+    background: #ffebeb;
+    border-color: #c8102e;
+}
+.alert-view-hint {
+    font-size: 0.65rem;
+    color: #c8102e;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    margin-top: 0.1rem;
+    text-align: right;
+}

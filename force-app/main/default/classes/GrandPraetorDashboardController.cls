@@ -25,6 +25,10 @@ public without sharing class GrandPraetorDashboardController {
         @AuraEnabled public List<OfficerSummary> chapterOfficers;
         @AuraEnabled public String debugInfo;
         @AuraEnabled public Decimal totalBalanceDue;
+        @AuraEnabled public Decimal due0to30;
+        @AuraEnabled public Decimal due31to60;
+        @AuraEnabled public Decimal due61to90;
+        @AuraEnabled public Decimal due90Plus;
         @AuraEnabled public Integer maxPostedAge;
         @AuraEnabled public String balanceStatus; // GREEN, YELLOW, AMBER, RED
     }
@@ -226,32 +230,11 @@ public without sharing class GrandPraetorDashboardController {
             officerPositions = new List<OrderApi__Position__c>();
         }
 
-        // Query Sales Orders directly — must match GPFinancialController pattern exactly
-        Map<Id, Decimal> balanceByChapter = new Map<Id, Decimal>();
-        Map<Id, Integer> maxAgeByChapter  = new Map<Id, Integer>();
-        try {
-            List<OrderApi__Sales_Order__c> orders = [
-                SELECT Id, OrderApi__Account__c,
-                       OrderApi__Balance_Due__c, Posted_Age__c
-                FROM OrderApi__Sales_Order__c
-                WHERE OrderApi__Account__c IN :chapterIds
-                  AND OrderApi__Balance_Due__c > 0
-                  AND OrderApi__Is_Posted__c = true
-                  AND OrderApi__Is_Voided__c = false
-                LIMIT 10000
-            ];
-            for (OrderApi__Sales_Order__c so : orders) {
-                Id acctId   = so.OrderApi__Account__c;
-                Decimal bal = so.OrderApi__Balance_Due__c != null ? so.OrderApi__Balance_Due__c : 0;
-                Integer age = so.Posted_Age__c != null ? Integer.valueOf(so.Posted_Age__c) : 0;
-                balanceByChapter.put(acctId,
-                    (balanceByChapter.containsKey(acctId) ? balanceByChapter.get(acctId) : 0) + bal);
-                if (!maxAgeByChapter.containsKey(acctId) || age > maxAgeByChapter.get(acctId)) {
-                    maxAgeByChapter.put(acctId, age);
-                }
-            }
-        } catch(Exception e) {
-            // balance unavailable
+        // Use helper class to get balance aging buckets
+        Map<Id, GrandPraetorBalanceHelper.BalanceResult> balanceMap =
+            new Map<Id, GrandPraetorBalanceHelper.BalanceResult>();
+        for (GrandPraetorBalanceHelper.BalanceResult br : GrandPraetorBalanceHelper.getBalances(chapterIds)) {
+            balanceMap.put(br.accountId, br);
         }
 
         Map<Id, List<OrderApi__Member_Information__c>> membersByChapter =
@@ -292,20 +275,24 @@ public without sharing class GrandPraetorDashboardController {
             data.positionNumber  = gpPos.Name;
             data.positionStartDate = gpPos.OrderApi__Start_Date__c;
             data.positionStatus  = gpPos.OrderApi__Status__c;
-            data.debugInfo       = 'OK|BalMap=' + balanceByChapter.size() + '|Bal=' + (balanceByChapter.containsKey(gpPos.OrderApi__Account__c) ? String.valueOf(balanceByChapter.get(gpPos.OrderApi__Account__c)) : '0') + '|Age=' + (maxAgeByChapter.containsKey(gpPos.OrderApi__Account__c) ? String.valueOf(maxAgeByChapter.get(gpPos.OrderApi__Account__c)) : '0');
+            data.debugInfo       = 'OK|BalMap=' + balanceMap.size() + '|Bal=' + data.totalBalanceDue + '|Age=' + data.maxPostedAge;
 
-            // Balance data
-            Decimal totalBal = balanceByChapter.containsKey(gpPos.OrderApi__Account__c)
-                ? balanceByChapter.get(gpPos.OrderApi__Account__c) : 0;
-            Integer maxAge = maxAgeByChapter.containsKey(gpPos.OrderApi__Account__c)
-                ? maxAgeByChapter.get(gpPos.OrderApi__Account__c) : 0;
+            // Balance data from helper
+            GrandPraetorBalanceHelper.BalanceResult br = balanceMap.containsKey(gpPos.OrderApi__Account__c)
+                ? balanceMap.get(gpPos.OrderApi__Account__c) : null;
+            Decimal totalBal = br != null ? br.totalBalance : 0;
+            Integer maxAge   = br != null ? br.maxAge : 0;
             data.totalBalanceDue = totalBal;
+            data.due0to30        = br != null ? br.due0to30  : 0;
+            data.due31to60       = br != null ? br.due31to60 : 0;
+            data.due61to90       = br != null ? br.due61to90 : 0;
+            data.due90Plus       = br != null ? br.due90Plus : 0;
             data.maxPostedAge    = maxAge;
             if (totalBal <= 0) {
                 data.balanceStatus = 'GREEN';
-            } else if (maxAge < 30) {
+            } else if (maxAge <= 30) {
                 data.balanceStatus = 'YELLOW';
-            } else if (maxAge < 90) {
+            } else if (maxAge <= 90) {
                 data.balanceStatus = 'AMBER';
             } else {
                 data.balanceStatus = 'RED';
@@ -442,5 +429,104 @@ public without sharing class GrandPraetorDashboardController {
         } catch(Exception e) {
             return null;
         }
+    }
+
+    public class OrderLineData {
+        @AuraEnabled public String  salesOrderId;
+        @AuraEnabled public String  salesOrderName;
+        @AuraEnabled public String  itemName;
+        @AuraEnabled public Decimal balanceDue;
+        @AuraEnabled public Decimal amountPaid;
+        @AuraEnabled public Date    postedDate;
+        @AuraEnabled public Date    dueDate;
+        @AuraEnabled public Decimal quantity;
+        @AuraEnabled public Decimal total;
+        @AuraEnabled public String  contactName;
+    }
+
+    @AuraEnabled
+    public static List<OrderLineData> getOrderLines(Id chapterId, String bucket) {
+        // Security gate — verify running user is an active GP on this chapter
+        Id userId = UserInfo.getUserId();
+        User currentUser;
+        try {
+            currentUser = [SELECT ContactId FROM User WHERE Id = :userId LIMIT 1];
+        } catch(Exception e) { return new List<OrderLineData>(); }
+        if (currentUser.ContactId == null) return new List<OrderLineData>();
+
+        List<OrderApi__Position__c> gpCheck = [
+            SELECT Id FROM OrderApi__Position__c
+            WHERE OrderApi__Contact__c = :currentUser.ContactId
+              AND OrderApi__Account__c = :chapterId
+              AND OrderApi__Role__c    = 'Grand Praetor'
+              AND OrderApi__Status__c  = 'Active'
+            LIMIT 1
+        ];
+        if (gpCheck.isEmpty()) return new List<OrderLineData>();
+
+        // Step 1: Get parent Sales Orders for this chapter
+        List<OrderApi__Sales_Order__c> orders = [
+            SELECT Id, Name, OrderApi__Due_Date__c,
+                   OrderApi__Posted_Date__c, Posted_Age__c,
+                   OrderApi__Balance_Due__c
+            FROM OrderApi__Sales_Order__c
+            WHERE OrderApi__Account__c    = :chapterId
+              AND OrderApi__Balance_Due__c > 0
+              AND OrderApi__Is_Posted__c   = true
+              AND OrderApi__Is_Voided__c   = false
+        ];
+
+        // Step 2: Filter to the requested bucket
+        Set<Id> bucketOrderIds = new Set<Id>();
+        for (OrderApi__Sales_Order__c so : orders) {
+            Decimal age = so.Posted_Age__c != null ? so.Posted_Age__c : 0;
+            Boolean inBucket = false;
+            if      (bucket == '0-30')  inBucket = age <= 30;
+            else if (bucket == '31-60') inBucket = age > 30 && age <= 60;
+            else if (bucket == '61-90') inBucket = age > 60 && age <= 90;
+            else if (bucket == '90+')   inBucket = age > 90;
+            if (inBucket) bucketOrderIds.add(so.Id);
+        }
+        if (bucketOrderIds.isEmpty()) return new List<OrderLineData>();
+
+        // Step 3: Get Sales Order Lines for those orders
+        List<OrderApi__Sales_Order_Line__c> lines = [
+            SELECT Id, Name,
+                   OrderApi__Item_Name__c,
+                   OrderApi__Balance_Due__c,
+                   OrderApi__Quantity__c,
+                   OrderApi__Total__c,
+                   OrderApi__Contact__r.Name,
+                   OrderApi__Sales_Order__c,
+                   OrderApi__Sales_Order__r.Name,
+                   OrderApi__Sales_Order__r.OrderApi__Due_Date__c,
+                   OrderApi__Sales_Order__r.OrderApi__Posted_Date__c
+            FROM OrderApi__Sales_Order_Line__c
+            WHERE OrderApi__Sales_Order__c IN :bucketOrderIds
+              AND OrderApi__Balance_Due__c  > 0
+              AND OrderApi__Is_Posted__c    = true
+            ORDER BY OrderApi__Sales_Order__r.OrderApi__Posted_Date__c ASC,
+                     OrderApi__Item_Name__c ASC
+        ];
+
+        List<OrderLineData> results = new List<OrderLineData>();
+        for (OrderApi__Sales_Order_Line__c ln : lines) {
+            OrderLineData d    = new OrderLineData();
+            d.salesOrderId     = ln.OrderApi__Sales_Order__c;
+            d.salesOrderName   = ln.OrderApi__Sales_Order__r.Name;
+            d.itemName         = ln.OrderApi__Item_Name__c;
+            d.balanceDue       = ln.OrderApi__Balance_Due__c;
+            d.postedDate       = ln.OrderApi__Sales_Order__r.OrderApi__Posted_Date__c;
+            d.dueDate          = ln.OrderApi__Sales_Order__r.OrderApi__Due_Date__c;
+            d.quantity         = ln.OrderApi__Quantity__c;
+            d.total            = ln.OrderApi__Total__c;
+            Decimal paid = (ln.OrderApi__Total__c != null && ln.OrderApi__Balance_Due__c != null)
+                ? ln.OrderApi__Total__c - ln.OrderApi__Balance_Due__c : 0;
+            d.amountPaid       = paid > 0 ? paid : 0;
+            d.contactName      = ln.OrderApi__Contact__r != null
+                                     ? ln.OrderApi__Contact__r.Name : null;
+            results.add(d);
+        }
+        return results;
     }
 }
