@@ -24,6 +24,9 @@ public without sharing class GrandPraetorDashboardController {
         @AuraEnabled public List<MemberSummary> activeMembers;
         @AuraEnabled public List<OfficerSummary> chapterOfficers;
         @AuraEnabled public String debugInfo;
+        @AuraEnabled public Decimal totalBalanceDue;
+        @AuraEnabled public Integer maxPostedAge;
+        @AuraEnabled public String balanceStatus; // GREEN, YELLOW, AMBER, RED
     }
 
     public class MemberSummary {
@@ -223,6 +226,34 @@ public without sharing class GrandPraetorDashboardController {
             officerPositions = new List<OrderApi__Position__c>();
         }
 
+        // Query Sales Orders directly — must match GPFinancialController pattern exactly
+        Map<Id, Decimal> balanceByChapter = new Map<Id, Decimal>();
+        Map<Id, Integer> maxAgeByChapter  = new Map<Id, Integer>();
+        try {
+            List<OrderApi__Sales_Order__c> orders = [
+                SELECT Id, OrderApi__Account__c,
+                       OrderApi__Balance_Due__c, Posted_Age__c
+                FROM OrderApi__Sales_Order__c
+                WHERE OrderApi__Account__c IN :chapterIds
+                  AND OrderApi__Balance_Due__c > 0
+                  AND OrderApi__Is_Posted__c = true
+                  AND OrderApi__Is_Voided__c = false
+                LIMIT 10000
+            ];
+            for (OrderApi__Sales_Order__c so : orders) {
+                Id acctId   = so.OrderApi__Account__c;
+                Decimal bal = so.OrderApi__Balance_Due__c != null ? so.OrderApi__Balance_Due__c : 0;
+                Integer age = so.Posted_Age__c != null ? Integer.valueOf(so.Posted_Age__c) : 0;
+                balanceByChapter.put(acctId,
+                    (balanceByChapter.containsKey(acctId) ? balanceByChapter.get(acctId) : 0) + bal);
+                if (!maxAgeByChapter.containsKey(acctId) || age > maxAgeByChapter.get(acctId)) {
+                    maxAgeByChapter.put(acctId, age);
+                }
+            }
+        } catch(Exception e) {
+            // balance unavailable
+        }
+
         Map<Id, List<OrderApi__Member_Information__c>> membersByChapter =
             new Map<Id, List<OrderApi__Member_Information__c>>();
         for (OrderApi__Member_Information__c mi : allMembers) {
@@ -261,7 +292,24 @@ public without sharing class GrandPraetorDashboardController {
             data.positionNumber  = gpPos.Name;
             data.positionStartDate = gpPos.OrderApi__Start_Date__c;
             data.positionStatus  = gpPos.OrderApi__Status__c;
-            data.debugInfo       = 'OK';
+            data.debugInfo       = 'OK|BalMap=' + balanceByChapter.size() + '|Bal=' + (balanceByChapter.containsKey(gpPos.OrderApi__Account__c) ? String.valueOf(balanceByChapter.get(gpPos.OrderApi__Account__c)) : '0') + '|Age=' + (maxAgeByChapter.containsKey(gpPos.OrderApi__Account__c) ? String.valueOf(maxAgeByChapter.get(gpPos.OrderApi__Account__c)) : '0');
+
+            // Balance data
+            Decimal totalBal = balanceByChapter.containsKey(gpPos.OrderApi__Account__c)
+                ? balanceByChapter.get(gpPos.OrderApi__Account__c) : 0;
+            Integer maxAge = maxAgeByChapter.containsKey(gpPos.OrderApi__Account__c)
+                ? maxAgeByChapter.get(gpPos.OrderApi__Account__c) : 0;
+            data.totalBalanceDue = totalBal;
+            data.maxPostedAge    = maxAge;
+            if (totalBal <= 0) {
+                data.balanceStatus = 'GREEN';
+            } else if (maxAge < 30) {
+                data.balanceStatus = 'YELLOW';
+            } else if (maxAge < 90) {
+                data.balanceStatus = 'AMBER';
+            } else {
+                data.balanceStatus = 'RED';
+            }
 
             String acctType = gpPos.OrderApi__Account__r.Type != null ? gpPos.OrderApi__Account__r.Type : '';
             String acctTypeLower = acctType.toLowerCase();

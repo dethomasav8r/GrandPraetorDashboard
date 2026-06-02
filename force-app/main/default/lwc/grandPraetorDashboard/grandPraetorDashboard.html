@@ -43,7 +43,7 @@
                     <div key={chapter.chapterId} class="chapter-card">
 
                         <!-- Chapter Header -->
-                        <div class="chapter-card-header">
+                        <div class={chapter.bannerClass}>
                             <div class="chapter-title-row">
                                 <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
                                 <div class="chapter-title-block">
@@ -69,6 +69,9 @@
                             </div>
                             <div class="chapter-meta">
                                 <span class="meta-badge status-active">{chapter.positionStatus}</span>
+                                <template if:true={chapter.hasBalance}>
+                                    <span class="meta-badge balance-badge">{chapter.formattedBalance} due</span>
+                                </template>
                             </div>
                         </div>
 
@@ -332,6 +335,39 @@
 
                     </div>
                 </template>
+            </div>
+        </template>
+
+        <!-- ── 90+ DAY BALANCE ALERT MODAL ── -->
+        <template if:true={showBalanceAlert}>
+            <div class="modal-backdrop" onclick={closeBalanceAlert}></div>
+            <div class="modal-container alert-modal" role="dialog" aria-modal="true">
+                <div class="modal-header alert-header">
+                    <div class="modal-header-left">
+                        <lightning-icon icon-name="utility:warning" size="small" variant="inverse"></lightning-icon>
+                        <h2 class="modal-title">⚠ Action Required — Past Due Chapters</h2>
+                    </div>
+                    <button class="modal-close" onclick={closeBalanceAlert} title="Close">
+                        <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="alert-intro">The following chapters have balances that are <strong>90+ days past due</strong>. Please contact them immediately.</p>
+                    <div class="alert-chapter-list">
+                        <template for:each={alertChapters} for:item="chapter">
+                            <div key={chapter.chapterId} class="alert-chapter-row">
+                                <div class="alert-chapter-info">
+                                    <span class="alert-chapter-name">{chapter.chapterName}</span>
+                                    <span class="alert-chapter-school">{chapter.schoolName}</span>
+                                </div>
+                                <div class="alert-chapter-balance">
+                                    <span class="alert-amount">{chapter.formattedBalance}</span>
+                                    <span class="alert-age">{chapter.maxPostedAge} days</span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
         </template>
 

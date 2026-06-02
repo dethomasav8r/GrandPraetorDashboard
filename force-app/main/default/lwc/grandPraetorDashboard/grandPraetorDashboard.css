@@ -426,3 +426,89 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
     flex-shrink: 0;
     opacity: 0.85;
 }
+
+/* ── Banner Color Variants ── */
+.banner-green {
+    background: linear-gradient(135deg, #1a4a2e 0%, #1a7f4b 100%);
+    padding: 1.25rem 1.5rem;
+    color: #ffffff;
+}
+.banner-yellow {
+    background: linear-gradient(135deg, #4a3a00 0%, #b8860b 100%);
+    padding: 1.25rem 1.5rem;
+    color: #ffffff;
+}
+.banner-amber {
+    background: linear-gradient(135deg, #6b3a00 0%, #cc6600 100%);
+    padding: 1.25rem 1.5rem;
+    color: #ffffff;
+}
+.banner-red {
+    background: linear-gradient(135deg, #6b0000 0%, #c8102e 100%);
+    padding: 1.25rem 1.5rem;
+    color: #ffffff;
+}
+
+/* ── Balance Badge in header ── */
+.balance-badge {
+    background: rgba(0,0,0,0.3);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* ── Balance Alert Modal ── */
+.alert-modal {
+    width: 480px;
+}
+.alert-header {
+    background: linear-gradient(135deg, #6b0000 0%, #c8102e 100%);
+}
+.alert-intro {
+    font-size: 0.88rem;
+    color: #333;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+.alert-chapter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.alert-chapter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    background: #fff5f5;
+    border: 1px solid #ffcccc;
+    border-radius: 8px;
+}
+.alert-chapter-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+.alert-chapter-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1a2e4a;
+}
+.alert-chapter-school {
+    font-size: 0.75rem;
+    color: #5a6a7a;
+}
+.alert-chapter-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+}
+.alert-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c8102e;
+}
+.alert-age {
+    font-size: 0.72rem;
+    color: #7a8a9a;
+}

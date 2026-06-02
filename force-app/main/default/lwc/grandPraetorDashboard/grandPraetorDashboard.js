@@ -9,6 +9,8 @@ export default class GrandPraetorDashboard extends LightningElement {
     @track errorMessage = '';
     @track debugMessage = '';
     @track showModal = false;
+    @track showBalanceAlert = false;
+    @track alertChapters = [];
     @track modalContact = null;
     @track modalLoading = false;
 
@@ -24,11 +26,17 @@ export default class GrandPraetorDashboard extends LightningElement {
         getDashboardData()
             .then(result => {
                 this.debugMessage = 'Apex returned ' + (result ? result.length : 'null') + ' records'
-                    + (result && result[0] && result[0].debugInfo ? ' | debug=' + result[0].debugInfo : '');
+                    + (result && result[0] && result[0].debugInfo ? ' | ch1=' + result[0].chapterName + ':' + result[0].debugInfo : '');
                 if (result && result.length > 0 && result[0].chapterId !== 'DEBUG') {
                     this.dashboardData = this.processData(result);
                 } else {
                     this.dashboardData = [];
+                }
+                // Check for 90+ day past due chapters and show alert
+                const redChapters = this.dashboardData.filter(c => c.isRed && c.hasBalance);
+                if (redChapters.length > 0) {
+                    this.alertChapters = redChapters;
+                    this.showBalanceAlert = true;
                 }
                 this.isLoading = false;
             })
@@ -89,6 +97,10 @@ export default class GrandPraetorDashboard extends LightningElement {
     closeModal() {
         this.showModal = false;
         this.modalContact = null;
+    }
+
+    closeBalanceAlert() {
+        this.showBalanceAlert = false;
     }
 
     get modalTitle() {
@@ -166,6 +178,12 @@ export default class GrandPraetorDashboard extends LightningElement {
                 hasPledgeEmails: pledgeEmails.length > 0, pledgeMailtoLink,
                 hasMembers: processedMembers.length > 0,
                 formattedFoundingDate,
+                formattedBalance: chapter.totalBalanceDue != null
+                    ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(chapter.totalBalanceDue)
+                    : '$0',
+                hasBalance: chapter.totalBalanceDue > 0,
+                isRed: chapter.balanceStatus === 'RED',
+                bannerClass: 'chapter-card-header banner-' + (chapter.balanceStatus || 'GREEN').toLowerCase(),
                 hasMemberEmails: memberEmails.length > 0, memberMailtoLink
             };
         });
