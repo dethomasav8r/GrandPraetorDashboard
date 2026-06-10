@@ -75,7 +75,7 @@
                             </div>
                             <template if:true={chapter.hasBalance}>
                                 <div class="aging-buckets">
-                                    <div class="aging-bucket bucket-clickable"
+                                    <div class="aging-bucket aging-bucket-0to30 bucket-clickable"
                                          data-chapter={chapter.chapterId}
                                          data-bucket="0-30"
                                          onclick={handleBucketClick}>
@@ -83,7 +83,7 @@
                                         <span class="aging-amount">{chapter.formatted0to30}</span>
                                         <span class="bucket-hint">tap to view</span>
                                     </div>
-                                    <div class="aging-bucket bucket-clickable"
+                                    <div class="aging-bucket aging-bucket-31to60 bucket-clickable"
                                          data-chapter={chapter.chapterId}
                                          data-bucket="31-60"
                                          onclick={handleBucketClick}>
@@ -91,7 +91,7 @@
                                         <span class="aging-amount">{chapter.formatted31to60}</span>
                                         <span class="bucket-hint">tap to view</span>
                                     </div>
-                                    <div class="aging-bucket bucket-clickable"
+                                    <div class="aging-bucket aging-bucket-61to90 bucket-clickable"
                                          data-chapter={chapter.chapterId}
                                          data-bucket="61-90"
                                          onclick={handleBucketClick}>
@@ -99,7 +99,7 @@
                                         <span class="aging-amount">{chapter.formatted61to90}</span>
                                         <span class="bucket-hint">tap to view</span>
                                     </div>
-                                    <div class="aging-bucket aging-bucket-red bucket-clickable"
+                                    <div class="aging-bucket aging-bucket-90plus bucket-clickable"
                                          data-chapter={chapter.chapterId}
                                          data-bucket="90+"
                                          onclick={handleBucketClick}>
@@ -382,14 +382,14 @@
                 <div class="modal-header alert-header">
                     <div class="modal-header-left">
                         <lightning-icon icon-name="utility:warning" size="small" variant="inverse"></lightning-icon>
-                        <h2 class="modal-title">⚠ Action Required — Past Due Chapters</h2>
+                        <h2 class="modal-title">⚠ Action Required — 61+ Days Past Due</h2>
                     </div>
                     <button class="modal-close" onclick={closeBalanceAlert} title="Close">
                         <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="alert-intro">The following chapters have balances that are <strong>90+ days past due</strong>. Please contact them immediately.</p>
+                    <p class="alert-intro">The following chapters have balances that are <strong>61+ days past due</strong>. Please contact them immediately.</p>
                     <div class="alert-chapter-list">
                         <template for:each={alertChapters} for:item="chapter">
                             <div key={chapter.chapterId}

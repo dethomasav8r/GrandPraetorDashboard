@@ -429,17 +429,17 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
 
 /* ── Banner Color Variants ── */
 .banner-green {
-    background: linear-gradient(135deg, #1a4a2e 0%, #1a7f4b 100%);
+    background: linear-gradient(135deg, #1a2e4a 0%, #243d5c 100%);
     padding: 1.25rem 1.5rem;
     color: #ffffff;
 }
 .banner-yellow {
-    background: linear-gradient(135deg, #4a3a00 0%, #b8860b 100%);
+    background: linear-gradient(135deg, #3a3000 0%, #6b5a00 100%);
     padding: 1.25rem 1.5rem;
     color: #ffffff;
 }
 .banner-amber {
-    background: linear-gradient(135deg, #6b3a00 0%, #cc6600 100%);
+    background: linear-gradient(135deg, #5a1a00 0%, #8b2500 100%);
     padding: 1.25rem 1.5rem;
     color: #ffffff;
 }
@@ -526,16 +526,18 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: rgba(255,255,255,0.1);
     border-radius: 6px;
-    padding: 0.3rem 0.4rem;
+    padding: 0.35rem 0.4rem;
+    background: rgba(255,255,255,0.1);
 }
-.aging-bucket-red {
-    background: rgba(200,16,46,0.4);
-}
+.aging-bucket-0to30  { background: rgba(39,174,96,0.50) !important; }
+.aging-bucket-31to60 { background: rgba(197,160,40,0.50) !important; }
+.aging-bucket-61to90 { background: rgba(197,160,40,0.75) !important; }
+.aging-bucket-90plus { background: rgba(200,16,46,0.75) !important; }
+.aging-bucket-red    { background: rgba(200,16,46,0.75) !important; }
 .aging-label {
     font-size: 0.62rem;
-    color: rgba(255,255,255,0.75);
+    color: rgba(255,255,255,0.90);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;

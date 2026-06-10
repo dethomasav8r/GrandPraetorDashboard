@@ -36,7 +36,7 @@ export default class GrandPraetorDashboard extends LightningElement {
 
                 if (result && result.length > 0 && result[0].chapterId !== 'DEBUG') {
                     this.dashboardData = this.processData(result);
-                    const redChapters = this.dashboardData.filter(c => c.isRed && c.hasBalance);
+                    const redChapters = this.dashboardData.filter(c => (c.isRed || c.balanceStatus === 'AMBER') && c.hasBalance);
                     if (redChapters.length > 0) {
                         this.alertChapters = redChapters;
                         this.showBalanceAlert = true;
