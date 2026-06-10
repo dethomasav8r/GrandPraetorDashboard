@@ -13,11 +13,16 @@
     <start>
         <locationX>176</locationX>
         <locationY>0</locationY>
-        <filterLogic>and</filterLogic>
+        <filterLogic>or</filterLogic>
         <filters>
             <field>OrderApi__Role__c</field>
             <operator>EqualTo</operator>
             <value><stringValue>Grand Praetor</stringValue></value>
+        </filters>
+        <filters>
+            <field>OrderApi__Role__c</field>
+            <operator>EqualTo</operator>
+            <value><stringValue>Assistant Grand Praetor</stringValue></value>
         </filters>
         <object>OrderApi__Position__c</object>
         <recordTriggerType>CreateAndUpdate</recordTriggerType>
@@ -83,18 +88,23 @@
         <connector>
             <targetReference>Has_Other_Positions</targetReference>
         </connector>
-        <filterLogic>and</filterLogic>
+        <filterLogic>(1 OR 2) AND 3 AND 4 AND 5</filterLogic>
+        <filters>
+            <field>OrderApi__Role__c</field>
+            <operator>EqualTo</operator>
+            <value><stringValue>Grand Praetor</stringValue></value>
+        </filters>
+        <filters>
+            <field>OrderApi__Role__c</field>
+            <operator>EqualTo</operator>
+            <value><stringValue>Assistant Grand Praetor</stringValue></value>
+        </filters>
         <filters>
             <field>OrderApi__Contact__c</field>
             <operator>EqualTo</operator>
             <value>
                 <elementReference>$Record.OrderApi__Contact__c</elementReference>
             </value>
-        </filters>
-        <filters>
-            <field>OrderApi__Role__c</field>
-            <operator>EqualTo</operator>
-            <value><stringValue>Grand Praetor</stringValue></value>
         </filters>
         <filters>
             <field>OrderApi__Status__c</field>

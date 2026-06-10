@@ -178,7 +178,7 @@ public without sharing class GrandPraetorDashboardController {
                        OrderApi__Account__r.RecordType.Name
                 FROM OrderApi__Position__c
                 WHERE OrderApi__Contact__c = :contactId
-                  AND OrderApi__Role__c = 'Grand Praetor'
+                  AND OrderApi__Role__c IN ('Grand Praetor', 'Assistant Grand Praetor')
                   AND OrderApi__Status__c = 'Active'
             ];
             debugData.debugInfo += ' | PositionCount=' + gpPositions.size();
@@ -458,7 +458,7 @@ public without sharing class GrandPraetorDashboardController {
             SELECT Id FROM OrderApi__Position__c
             WHERE OrderApi__Contact__c = :currentUser.ContactId
               AND OrderApi__Account__c = :chapterId
-              AND OrderApi__Role__c    = 'Grand Praetor'
+              AND OrderApi__Role__c    IN ('Grand Praetor', 'Assistant Grand Praetor')
               AND OrderApi__Status__c  = 'Active'
             LIMIT 1
         ];

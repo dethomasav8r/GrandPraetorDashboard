@@ -15,7 +15,7 @@ System.debug('Permission Set Id: ' + ps.Id);
 List<OrderApi__Badge__c> activeBadges = [
     SELECT OrderApi__Contact__c
     FROM OrderApi__Badge__c
-    WHERE OrderApi__Badge_Type__r.Name = 'Grand Praetor'
+    WHERE OrderApi__Badge_Type__r.Name IN ('Grand Praetor', 'Assistant Grand Praetor')
       AND OrderApi__Is_Active__c = true
       AND OrderApi__Contact__c != null
 ];
