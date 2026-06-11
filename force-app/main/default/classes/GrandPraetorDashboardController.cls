@@ -198,7 +198,8 @@ public without sharing class GrandPraetorDashboardController {
         Set<Id> chapterIds = new Set<Id>();
         for (OrderApi__Position__c pos : gpPositions) {
             if (pos.OrderApi__Account__c != null
-                && pos.OrderApi__Account__r.RecordType.Name != 'Province') {
+                && (pos.OrderApi__Account__r.RecordType == null ||
+                    pos.OrderApi__Account__r.RecordType.Name != 'Province')) {
                 chapterIds.add(pos.OrderApi__Account__c);
             }
         }
@@ -268,7 +269,8 @@ public without sharing class GrandPraetorDashboardController {
 
         for (OrderApi__Position__c gpPos : gpPositions) {
             // Skip Province accounts
-            if (gpPos.OrderApi__Account__r.RecordType.Name == 'Province') continue;
+            if (gpPos.OrderApi__Account__r.RecordType != null &&
+                gpPos.OrderApi__Account__r.RecordType.Name == 'Province') continue;
             ChapterDashboardData data = new ChapterDashboardData();
             data.chapterId       = gpPos.OrderApi__Account__c;
             data.chapterName     = gpPos.OrderApi__Account__r.Name;
@@ -397,7 +399,7 @@ public without sharing class GrandPraetorDashboardController {
                     op.OrderApi__Role__c == 'University Vice President' ||
                     op.OrderApi__Role__c == 'University Dean of Students' ||
                     op.OrderApi__Role__c == 'Univ. Alumni Office' ||
-                    op.OrderApi__Role__c.startsWith('KTLW Attendee')) continue;
+                    (op.OrderApi__Role__c != null && op.OrderApi__Role__c.startsWith('KTLW Attendee'))) continue;
                 OfficerSummary os = new OfficerSummary();
                 os.positionId  = op.Id;
                 os.officerName = op.OrderApi__Contact__r.Name;
