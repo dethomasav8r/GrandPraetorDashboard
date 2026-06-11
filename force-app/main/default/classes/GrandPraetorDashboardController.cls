@@ -126,7 +126,25 @@ public without sharing class GrandPraetorDashboardController {
     }
 
     @AuraEnabled
+    // Test-visible entry point — allows tests to pass contactId directly
+    @TestVisible
+    public static List<ChapterDashboardData> getDashboardDataForContact(Id contactId) {
+        return getDashboardDataImpl(contactId);
+    }
+
     public static List<ChapterDashboardData> getDashboardData() {
+        Id userId = UserInfo.getUserId();
+        User currentUser;
+        try {
+            currentUser = [SELECT ContactId FROM User WHERE Id = :userId LIMIT 1];
+        } catch(Exception e) {
+            return new List<ChapterDashboardData>();
+        }
+        if (currentUser.ContactId == null) return new List<ChapterDashboardData>();
+        return getDashboardDataImpl(currentUser.ContactId);
+    }
+
+    public static List<ChapterDashboardData> getDashboardDataImpl(Id contactId) {
 
         ChapterDashboardData debugData = new ChapterDashboardData();
         debugData.chapterId        = 'DEBUG';
@@ -143,24 +161,7 @@ public without sharing class GrandPraetorDashboardController {
         debugData.activeMembers    = new List<MemberSummary>();
         debugData.chapterOfficers  = new List<OfficerSummary>();
 
-        Id userId = UserInfo.getUserId();
-        debugData.debugInfo = 'UserId=' + userId;
-
-        User currentUser;
-        try {
-            currentUser = [SELECT ContactId FROM User WHERE Id = :userId LIMIT 1];
-            debugData.debugInfo += ' | ContactId=' + currentUser.ContactId;
-        } catch(Exception e) {
-            debugData.debugInfo += ' | USER_ERR=' + e.getMessage();
-            return new List<ChapterDashboardData>{ debugData };
-        }
-
-        if (currentUser.ContactId == null) {
-            debugData.debugInfo += ' | FAIL=NoContact';
-            return new List<ChapterDashboardData>{ debugData };
-        }
-
-        Id contactId = currentUser.ContactId;
+        debugData.debugInfo = 'ContactId=' + contactId;
 
         List<OrderApi__Position__c> gpPositions;
         try {
