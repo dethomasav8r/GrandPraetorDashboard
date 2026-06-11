@@ -49,6 +49,7 @@ public without sharing class GrandPraetorDashboardController {
         @AuraEnabled public String role;
         @AuraEnabled public String email;
         @AuraEnabled public Date startDate;
+        @AuraEnabled public Date initiationDate;
         @AuraEnabled public String status;
         @AuraEnabled public Integer sortOrder;
         @AuraEnabled public String contactId;
@@ -225,7 +226,9 @@ public without sharing class GrandPraetorDashboardController {
                 SELECT Id, Name, OrderApi__Role__c, OrderApi__Status__c,
                        OrderApi__Start_Date__c, OrderApi__Account__c,
                        OrderApi__Contact__c,
-                       OrderApi__Contact__r.Name, OrderApi__Email__c
+                       OrderApi__Contact__r.Name,
+                       OrderApi__Contact__r.Initiation_Date__c,
+                       OrderApi__Email__c
                 FROM OrderApi__Position__c
                 WHERE OrderApi__Account__c IN :chapterIds
                   AND OrderApi__Status__c = 'Active'
@@ -400,7 +403,9 @@ public without sharing class GrandPraetorDashboardController {
                 os.email       = op.OrderApi__Email__c;
                 os.startDate   = op.OrderApi__Start_Date__c;
                 os.status      = op.OrderApi__Status__c;
-                os.contactId   = op.OrderApi__Contact__c;
+                os.contactId      = op.OrderApi__Contact__c;
+                os.initiationDate = op.OrderApi__Contact__r != null
+                    ? op.OrderApi__Contact__r.Initiation_Date__c : null;
                 os.sortOrder   = isAlumni
                     ? alumniOfficerSort(op.OrderApi__Role__c)
                     : undergradOfficerSort(op.OrderApi__Role__c);

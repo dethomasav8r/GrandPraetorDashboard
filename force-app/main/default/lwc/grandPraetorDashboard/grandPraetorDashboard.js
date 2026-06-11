@@ -206,7 +206,10 @@ export default class GrandPraetorDashboard extends LightningElement {
         if (!rawData || rawData.length === 0) return [];
         return rawData.map(chapter => {
             const processedOfficers = (chapter.chapterOfficers || []).map(o => ({
-                ...o, emailLink: this.isValidEmail(o.email) ? `mailto:${o.email}` : null
+                ...o,
+                emailLink: this.isValidEmail(o.email) ? `mailto:${o.email}` : null,
+                formattedStartDate: o.startDate ? this.formatDate(o.startDate) : null,
+                formattedInitDate:  o.initiationDate ? this.formatDate(o.initiationDate) : null
             }));
             const officerEmails = processedOfficers.filter(o => this.isValidEmail(o.email)).map(o => o.email);
 

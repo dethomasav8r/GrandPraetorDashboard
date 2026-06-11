@@ -160,6 +160,12 @@
                                                             {officer.officerName}
                                                         </button>
                                                         <span class="row-sub red">{officer.role}</span>
+                                                        <template if:true={officer.formattedStartDate}>
+                                                            <span class="officer-date">In office: {officer.formattedStartDate}</span>
+                                                        </template>
+                                                        <template if:true={officer.formattedInitDate}>
+                                                            <span class="officer-date">Initiated: {officer.formattedInitDate}</span>
+                                                        </template>
                                                     </div>
                                                     <template if:true={officer.emailLink}>
                                                         <a href={officer.emailLink} class="row-email-btn" title={officer.email}>
@@ -305,6 +311,12 @@
                                                             {officer.officerName}
                                                         </button>
                                                         <span class="row-sub red">{officer.role}</span>
+                                                        <template if:true={officer.formattedStartDate}>
+                                                            <span class="officer-date">In office: {officer.formattedStartDate}</span>
+                                                        </template>
+                                                        <template if:true={officer.formattedInitDate}>
+                                                            <span class="officer-date">Initiated: {officer.formattedInitDate}</span>
+                                                        </template>
                                                     </div>
                                                     <template if:true={officer.emailLink}>
                                                         <a href={officer.emailLink} class="row-email-btn" title={officer.email}>

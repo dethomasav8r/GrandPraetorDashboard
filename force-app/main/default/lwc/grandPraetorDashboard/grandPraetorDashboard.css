@@ -660,3 +660,11 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
     margin-top: 0.1rem;
     text-align: right;
 }
+
+/* ── Officer dates ── */
+.officer-date {
+    display: block;
+    font-size: 0.68rem;
+    color: #5a6a7a;
+    margin-top: 0.1rem;
+}
