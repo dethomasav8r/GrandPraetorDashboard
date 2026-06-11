@@ -196,7 +196,10 @@ public without sharing class GrandPraetorDashboardController {
 
         Set<Id> chapterIds = new Set<Id>();
         for (OrderApi__Position__c pos : gpPositions) {
-            if (pos.OrderApi__Account__c != null) chapterIds.add(pos.OrderApi__Account__c);
+            if (pos.OrderApi__Account__c != null
+                && pos.OrderApi__Account__r.RecordType.Name != 'Province') {
+                chapterIds.add(pos.OrderApi__Account__c);
+            }
         }
 
         List<OrderApi__Member_Information__c> allMembers;
