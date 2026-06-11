@@ -8,12 +8,60 @@
 
 /* ── Header ── */
 .dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     text-align: center;
     margin-bottom: 2rem;
     padding: 1.5rem;
     background: linear-gradient(135deg, #00A3E0 0%, #FEC141 100%);
     border-radius: 12px;
     color: #ffffff;
+}
+.dashboard-header-left,
+.dashboard-header-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0 1rem;
+}
+.dashboard-header-right {
+    align-items: flex-end;
+}
+.dashboard-header-left {
+    align-items: flex-start;
+}
+.dashboard-header-center {
+    flex: 0 0 auto;
+    text-align: center;
+}
+.header-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+}
+.header-contact-label {
+    color: rgba(255,255,255,0.70);
+    font-weight: 600;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: block;
+    margin-bottom: 0.1rem;
+}
+.header-contact-link {
+    color: #ffffff;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+.header-contact-link:hover { text-decoration: underline; }
+.header-contact-email {
+    color: rgba(255,255,255,0.75);
+    display: flex;
+    align-items: center;
 }
 .dashboard-title {
     font-size: 2rem;

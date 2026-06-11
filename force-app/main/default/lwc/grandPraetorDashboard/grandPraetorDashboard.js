@@ -5,6 +5,7 @@ import getOrderLines from '@salesforce/apex/GrandPraetorDashboardController.getO
 
 export default class GrandPraetorDashboard extends LightningElement {
     @track dashboardData = [];
+    @track gpInfo = {};
     @track isLoading = true;
     @track hasError = false;
     @track errorMessage = '';
