@@ -132,6 +132,7 @@ public without sharing class GrandPraetorDashboardController {
         return getDashboardDataImpl(contactId);
     }
 
+    @AuraEnabled
     public static List<ChapterDashboardData> getDashboardData() {
         Id userId = UserInfo.getUserId();
         User currentUser;
