@@ -384,6 +384,10 @@ public without sharing class GrandPraetorDashboardController {
             for (OrderApi__Position__c op : chapterOfficers) {
                 // Exclude Alumni Chapter Member from non-alumni chapters
                 if (op.OrderApi__Role__c == 'Alumni Chapter Member' && !isAlumni) continue;
+                // Exclude university staff roles
+                if (op.OrderApi__Role__c == 'University President' ||
+                    op.OrderApi__Role__c == 'University Vice President' ||
+                    op.OrderApi__Role__c == 'University Dean of Students') continue;
                 OfficerSummary os = new OfficerSummary();
                 os.positionId  = op.Id;
                 os.officerName = op.OrderApi__Contact__r.Name;
