@@ -288,7 +288,8 @@ public without sharing class GrandPraetorDashboardController {
             data.positionId      = gpPos.Id;
             data.positionNumber  = gpPos.Name;
             data.positionStartDate = gpPos.OrderApi__Start_Date__c;
-            data.positionStatus  = gpPos.OrderApi__Status__c;
+            String chapStatus = gpPos.OrderApi__Account__r.OrderApi__Chapter_Status__c;
+            data.positionStatus  = String.isNotBlank(chapStatus) ? chapStatus : gpPos.OrderApi__Status__c;
             data.debugInfo       = 'OK|BalMap=' + balanceMap.size() + '|Bal=' + data.totalBalanceDue + '|Age=' + data.maxPostedAge;
 
             // Balance data from helper
