@@ -6,6 +6,15 @@ import getOrderLines from '@salesforce/apex/GrandPraetorDashboardController.getO
 export default class GrandPraetorDashboard extends LightningElement {
     @track dashboardData = [];
     @track gpInfo = {};
+
+    get headerGpName()      { return this.gpInfo.gpName      || null; }
+    get headerGpEmailLink() { return this.gpInfo.gpEmailLink || null; }
+    get headerGpContactId() { return this.gpInfo.gpContactId || null; }
+    get headerGpEmail()     { return this.gpInfo.gpEmail      || null; }
+    get headerAgpName()      { return this.gpInfo.agpName      || null; }
+    get headerAgpEmailLink() { return this.gpInfo.agpEmailLink || null; }
+    get headerAgpContactId() { return this.gpInfo.agpContactId || null; }
+    get headerAgpEmail()     { return this.gpInfo.agpEmail      || null; }
     @track isLoading = true;
     @track hasError = false;
     @track errorMessage = '';

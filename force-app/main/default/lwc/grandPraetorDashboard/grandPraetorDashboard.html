@@ -4,12 +4,12 @@
         <!-- Header -->
         <div class="dashboard-header">
             <div class="dashboard-header-left">
-                <template if:true={gpInfo.gpName}>
+                <template if:true={headerGpName}>
                     <div class="header-contact-item">
                         <span class="header-contact-label">Grand Praetor</span>
-                        <a onclick={handleContactClick} data-contactid={gpInfo.gpContactId} class="header-contact-link">{gpInfo.gpName}</a>
-                        <template if:true={gpInfo.gpEmailLink}>
-                            <a href={gpInfo.gpEmailLink} class="header-contact-email" title={gpInfo.gpEmail}>
+                        <a onclick={handleContactClick} data-contactid={headerGpContactId} class="header-contact-link">{headerGpName}</a>
+                        <template if:true={headerGpEmailLink}>
+                            <a href={headerGpEmailLink} class="header-contact-email" title={headerGpEmail}>
                                 <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
                             </a>
                         </template>
@@ -21,12 +21,12 @@
                 <p class="dashboard-subtitle">Chapter Overview</p>
             </div>
             <div class="dashboard-header-right">
-                <template if:true={gpInfo.agpName}>
+                <template if:true={headerAgpName}>
                     <div class="header-contact-item">
                         <span class="header-contact-label">Assistant Grand Praetor</span>
-                        <a onclick={handleContactClick} data-contactid={gpInfo.agpContactId} class="header-contact-link">{gpInfo.agpName}</a>
-                        <template if:true={gpInfo.agpEmailLink}>
-                            <a href={gpInfo.agpEmailLink} class="header-contact-email" title={gpInfo.agpEmail}>
+                        <a onclick={handleContactClick} data-contactid={headerAgpContactId} class="header-contact-link">{headerAgpName}</a>
+                        <template if:true={headerAgpEmailLink}>
+                            <a href={headerAgpEmailLink} class="header-contact-email" title={headerAgpEmail}>
                                 <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
                             </a>
                         </template>
