@@ -261,7 +261,7 @@ export default class GrandPraetorDashboard extends LightningElement {
                 formatted61to90:  this.formatCurrency(chapter.due61to90),
                 formatted90Plus:  this.formatCurrency(chapter.due90Plus),
                 hasBalance: chapter.totalBalanceDue > 0,
-                isRed: chapter.balanceStatus === 'RED',
+                isRed: chapter.balanceStatus === 'RED' || chapter.balanceStatus === 'AMBER',
                 bannerClass: 'chapter-card-header banner-' + (chapter.balanceStatus || 'GREEN').toLowerCase(),
                 // Detail panel state
                 showDetail: false,

@@ -291,8 +291,10 @@ public without sharing class GrandPraetorDashboardController {
             data.due90Plus       = br != null ? br.due90Plus : 0;
             data.maxPostedAge    = maxAge;
             if (totalBal <= 0) {
-                data.balanceStatus = 'GREEN';
+                data.balanceStatus = 'BLUE';
             } else if (maxAge <= 30) {
+                data.balanceStatus = 'GREEN';
+            } else if (maxAge <= 60) {
                 data.balanceStatus = 'YELLOW';
             } else if (maxAge <= 90) {
                 data.balanceStatus = 'AMBER';
