@@ -377,14 +377,14 @@
                 <div class="modal-header alert-header">
                     <div class="modal-header-left">
                         <lightning-icon icon-name="utility:warning" size="small" variant="inverse"></lightning-icon>
-                        <h2 class="modal-title">⚠ Action Required — 61+ Days Past Due</h2>
+                        <h2 class="modal-title">⚠ Action Required — 60+ Days Past Due</h2>
                     </div>
                     <button class="modal-close" onclick={closeBalanceAlert} title="Close">
                         <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="alert-intro">The following chapters have balances that are <strong>61+ days past due</strong>. Please contact them immediately.</p>
+                    <p class="alert-intro">The following chapters have balances that are <strong>60+ days past due</strong>. Please contact them immediately.</p>
                     <div class="alert-chapter-list">
                         <template for:each={alertChapters} for:item="chapter">
                             <div key={chapter.chapterId}
