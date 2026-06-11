@@ -48,7 +48,6 @@ private class GrandPraetorDashboardControllerTest {
         List<GrandPraetorDashboardController.ChapterDashboardData> result =
             GrandPraetorDashboardController.getDashboardDataForContact(c.Id);
         System.assertNotEquals(null, result, 'Should not be null');
-        // Result is valid — may have positions from existing sandbox data
         System.assert(result.size() >= 0, 'Should return a valid list');
     }
 
@@ -59,6 +58,7 @@ private class GrandPraetorDashboardControllerTest {
             GrandPraetorDashboardController.getDashboardDataForContact(null);
         System.assertNotEquals(null, result, 'Should not be null');
     }
+
 
     // ── getContactDetail ──────────────────────────────────────────────────────
 
