@@ -668,3 +668,21 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
     color: #5a6a7a;
     margin-top: 0.1rem;
 }
+
+/* ── Alert chapter status ── */
+.alert-chapter-status {
+    display: inline-block;
+    margin-top: 0.2rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    background: #e8f4fd;
+    color: #1a5276;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.alert-chapter-status:not(:empty) {
+    background: #fdf2e9;
+    color: #784212;
+}
