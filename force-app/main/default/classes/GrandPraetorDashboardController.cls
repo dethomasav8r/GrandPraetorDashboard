@@ -178,7 +178,8 @@ public without sharing class GrandPraetorDashboardController {
                        OrderApi__Account__r.BillingState,
                        OrderApi__Account__r.BillingPostalCode,
                        OrderApi__Account__r.Type,
-                       OrderApi__Account__r.RecordType.Name
+                       OrderApi__Account__r.RecordType.Name,
+                       OrderApi__Account__r.OrderApi__Chapter_Status__c
                 FROM OrderApi__Position__c
                 WHERE OrderApi__Contact__c = :contactId
                   AND OrderApi__Role__c IN ('Grand Praetor', 'Assistant Grand Praetor')
