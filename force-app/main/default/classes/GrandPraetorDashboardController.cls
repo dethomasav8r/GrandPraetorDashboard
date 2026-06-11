@@ -395,7 +395,8 @@ public without sharing class GrandPraetorDashboardController {
                 // Exclude university staff roles
                 if (op.OrderApi__Role__c == 'University President' ||
                     op.OrderApi__Role__c == 'University Vice President' ||
-                    op.OrderApi__Role__c == 'University Dean of Students') continue;
+                    op.OrderApi__Role__c == 'University Dean of Students' ||
+                    op.OrderApi__Role__c == 'Univ. Alumni Office') continue;
                 OfficerSummary os = new OfficerSummary();
                 os.positionId  = op.Id;
                 os.officerName = op.OrderApi__Contact__r.Name;
