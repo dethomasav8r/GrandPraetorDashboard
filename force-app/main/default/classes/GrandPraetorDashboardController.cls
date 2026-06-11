@@ -227,6 +227,7 @@ public without sharing class GrandPraetorDashboardController {
                 WHERE OrderApi__Account__c IN :chapterIds
                   AND OrderApi__Status__c = 'Active'
                   AND OrderApi__Type__c = 'Chapter'
+
             ];
         } catch(Exception e) {
             officerPositions = new List<OrderApi__Position__c>();
@@ -381,6 +382,8 @@ public without sharing class GrandPraetorDashboardController {
                     : new List<OrderApi__Position__c>();
 
             for (OrderApi__Position__c op : chapterOfficers) {
+                // Exclude Alumni Chapter Member from non-alumni chapters
+                if (op.OrderApi__Role__c == 'Alumni Chapter Member' && !isAlumni) continue;
                 OfficerSummary os = new OfficerSummary();
                 os.positionId  = op.Id;
                 os.officerName = op.OrderApi__Contact__r.Name;
