@@ -434,12 +434,12 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
     color: #ffffff;
 }
 .banner-yellow {
-    background: linear-gradient(135deg, #3a3000 0%, #6b5a00 100%);
+    background: linear-gradient(135deg, #c88000 0%, #FEC141 100%);
     padding: 1.25rem 1.5rem;
     color: #ffffff;
 }
 .banner-amber {
-    background: linear-gradient(135deg, #5a1a00 0%, #8b2500 100%);
+    background: linear-gradient(135deg, #c88000 0%, #FEC141 100%);
     padding: 1.25rem 1.5rem;
     color: #ffffff;
 }
