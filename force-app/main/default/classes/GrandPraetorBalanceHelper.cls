@@ -31,6 +31,7 @@ public without sharing class GrandPraetorBalanceHelper {
                   AND OrderApi__Balance_Due__c > 0
                   AND OrderApi__Is_Posted__c = true
                   AND OrderApi__Is_Voided__c = false
+                  AND OrderApi__Entity__c = 'Account'
                 LIMIT 10000
             ];
             for (OrderApi__Sales_Order__c so : orders) {

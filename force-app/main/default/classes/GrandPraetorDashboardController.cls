@@ -478,6 +478,7 @@ public without sharing class GrandPraetorDashboardController {
               AND OrderApi__Balance_Due__c > 0
               AND OrderApi__Is_Posted__c   = true
               AND OrderApi__Is_Voided__c   = false
+              AND OrderApi__Entity__c       = 'Account'
         ];
 
         // Step 2: Filter to the requested bucket
