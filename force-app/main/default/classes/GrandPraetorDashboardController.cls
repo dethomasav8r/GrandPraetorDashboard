@@ -315,13 +315,24 @@ public without sharing class GrandPraetorDashboardController {
 
         List<ChapterDashboardData> results = new List<ChapterDashboardData>();
 
-        // Build AGP map by account for cross-referencing
+        // Query AGPs for the same chapter accounts (separate contact, so separate query)
         Map<Id, OrderApi__Position__c> agpByAccount = new Map<Id, OrderApi__Position__c>();
-        for (OrderApi__Position__c pos : gpPositions) {
-            if (pos.OrderApi__Role__c == 'Assistant Grand Praetor') {
-                agpByAccount.put(pos.OrderApi__Account__c, pos);
+        try {
+            List<OrderApi__Position__c> agpPositions = [
+                SELECT Id, OrderApi__Account__c, OrderApi__Role__c,
+                       OrderApi__Contact__c, OrderApi__Contact__r.Name,
+                       OrderApi__Email__c
+                FROM OrderApi__Position__c
+                WHERE OrderApi__Account__c IN :chapterIds
+                  AND OrderApi__Role__c = 'Assistant Grand Praetor'
+                  AND OrderApi__Status__c = 'Active'
+            ];
+            for (OrderApi__Position__c agp : agpPositions) {
+                if (!agpByAccount.containsKey(agp.OrderApi__Account__c)) {
+                    agpByAccount.put(agp.OrderApi__Account__c, agp);
+                }
             }
-        }
+        } catch(Exception e) { }
 
         for (OrderApi__Position__c gpPos : gpPositions) {
             // Skip Province accounts
