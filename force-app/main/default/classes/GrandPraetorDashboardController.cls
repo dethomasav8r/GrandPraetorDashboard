@@ -315,6 +315,14 @@ public without sharing class GrandPraetorDashboardController {
 
         List<ChapterDashboardData> results = new List<ChapterDashboardData>();
 
+        // Build AGP map by account for cross-referencing
+        Map<Id, OrderApi__Position__c> agpByAccount = new Map<Id, OrderApi__Position__c>();
+        for (OrderApi__Position__c pos : gpPositions) {
+            if (pos.OrderApi__Role__c == 'Assistant Grand Praetor') {
+                agpByAccount.put(pos.OrderApi__Account__c, pos);
+            }
+        }
+
         for (OrderApi__Position__c gpPos : gpPositions) {
             // Skip Province accounts
             if (gpPos.OrderApi__Account__r.RecordType != null &&
@@ -337,15 +345,18 @@ public without sharing class GrandPraetorDashboardController {
             data.positionStartDate = gpPos.OrderApi__Start_Date__c;
             String chapStatus = gpPos.OrderApi__Account__r.OrderApi__Chapter_Status__c;
             data.positionStatus  = String.isNotBlank(chapStatus) ? chapStatus : gpPos.OrderApi__Status__c;
-            // GP/AGP info from the triggering position
+            // GP/AGP info from positions
             if (gpPos.OrderApi__Role__c == 'Grand Praetor') {
                 data.gpName      = gpPos.OrderApi__Contact__r != null ? gpPos.OrderApi__Contact__r.Name : null;
                 data.gpEmail     = gpPos.OrderApi__Email__c;
                 data.gpContactId = gpPos.OrderApi__Contact__c;
-            } else if (gpPos.OrderApi__Role__c == 'Assistant Grand Praetor') {
-                data.agpName      = gpPos.OrderApi__Contact__r != null ? gpPos.OrderApi__Contact__r.Name : null;
-                data.agpEmail     = gpPos.OrderApi__Email__c;
-                data.agpContactId = gpPos.OrderApi__Contact__c;
+            }
+            // Find AGP for this account
+            if (agpByAccount.containsKey(gpPos.OrderApi__Account__c)) {
+                OrderApi__Position__c agp = agpByAccount.get(gpPos.OrderApi__Account__c);
+                data.agpName      = agp.OrderApi__Contact__r != null ? agp.OrderApi__Contact__r.Name : null;
+                data.agpEmail     = agp.OrderApi__Email__c;
+                data.agpContactId = agp.OrderApi__Contact__c;
             }
 
             // Chapter advisor
