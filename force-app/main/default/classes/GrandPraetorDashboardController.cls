@@ -401,7 +401,8 @@ public without sharing class GrandPraetorDashboardController {
                     op.OrderApi__Role__c == 'University Vice President' ||
                     op.OrderApi__Role__c == 'University Dean of Students' ||
                     op.OrderApi__Role__c == 'Univ. Alumni Office' ||
-                    (op.OrderApi__Role__c != null && op.OrderApi__Role__c.startsWith('KTLW Attendee'))) continue;
+                    (op.OrderApi__Role__c != null && op.OrderApi__Role__c.startsWith('KTLW Attendee')) ||
+                    op.OrderApi__Role__c == 'Sweetheart') continue;
                 OfficerSummary os = new OfficerSummary();
                 os.positionId  = op.Id;
                 os.officerName = op.OrderApi__Contact__r.Name;
