@@ -264,6 +264,8 @@ public without sharing class GrandPraetorDashboardController {
         List<ChapterDashboardData> results = new List<ChapterDashboardData>();
 
         for (OrderApi__Position__c gpPos : gpPositions) {
+            // Skip Province accounts
+            if (gpPos.OrderApi__Account__r.RecordType.Name == 'Province') continue;
             ChapterDashboardData data = new ChapterDashboardData();
             data.chapterId       = gpPos.OrderApi__Account__c;
             data.chapterName     = gpPos.OrderApi__Account__r.Name;
