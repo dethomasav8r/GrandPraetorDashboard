@@ -24,6 +24,16 @@ public without sharing class GrandPraetorDashboardController {
         @AuraEnabled public List<MemberSummary> activeMembers;
         @AuraEnabled public List<OfficerSummary> chapterOfficers;
         @AuraEnabled public String debugInfo;
+        @AuraEnabled public String gpName;
+        @AuraEnabled public String gpEmail;
+        @AuraEnabled public String gpContactId;
+        @AuraEnabled public String agpName;
+        @AuraEnabled public String agpEmail;
+        @AuraEnabled public String agpContactId;
+        @AuraEnabled public String advisorName;
+        @AuraEnabled public String advisorEmail;
+        @AuraEnabled public String advisorRole;
+        @AuraEnabled public String advisorContactId;
         @AuraEnabled public Decimal totalBalanceDue;
         @AuraEnabled public Decimal due0to30;
         @AuraEnabled public Decimal due31to60;
@@ -169,6 +179,9 @@ public without sharing class GrandPraetorDashboardController {
         try {
             gpPositions = [
                 SELECT Id, Name, OrderApi__Type__c, OrderApi__Status__c,
+                       OrderApi__Role__c, OrderApi__Contact__c,
+                       OrderApi__Email__c,
+                       OrderApi__Contact__r.Name,
                        OrderApi__Start_Date__c, OrderApi__Account__c,
                        OrderApi__Account__r.Name,
                        OrderApi__Account__r.School__c,
@@ -241,6 +254,29 @@ public without sharing class GrandPraetorDashboardController {
             officerPositions = new List<OrderApi__Position__c>();
         }
 
+        // Query chapter advisor positions
+        List<OrderApi__Position__c> advisorPositions;
+        try {
+            advisorPositions = [
+                SELECT Id, OrderApi__Account__c, OrderApi__Role__c,
+                       OrderApi__Contact__c, OrderApi__Contact__r.Name,
+                       OrderApi__Email__c
+                FROM OrderApi__Position__c
+                WHERE OrderApi__Account__c IN :chapterIds
+                  AND OrderApi__Status__c = 'Active'
+                  AND OrderApi__Role__c IN ('Chapter Advisor', 'Greek Advisor',
+                                            'Faculty Advisor', 'Assistant Chapter Advisor')
+            ];
+        } catch(Exception e) {
+            advisorPositions = new List<OrderApi__Position__c>();
+        }
+        Map<Id, OrderApi__Position__c> advisorByChapter = new Map<Id, OrderApi__Position__c>();
+        for (OrderApi__Position__c ap : advisorPositions) {
+            if (!advisorByChapter.containsKey(ap.OrderApi__Account__c)) {
+                advisorByChapter.put(ap.OrderApi__Account__c, ap);
+            }
+        }
+
         // Use helper class to get balance aging buckets
         Map<Id, GrandPraetorBalanceHelper.BalanceResult> balanceMap =
             new Map<Id, GrandPraetorBalanceHelper.BalanceResult>();
@@ -290,6 +326,26 @@ public without sharing class GrandPraetorDashboardController {
             data.positionStartDate = gpPos.OrderApi__Start_Date__c;
             String chapStatus = gpPos.OrderApi__Account__r.OrderApi__Chapter_Status__c;
             data.positionStatus  = String.isNotBlank(chapStatus) ? chapStatus : gpPos.OrderApi__Status__c;
+            // GP/AGP info from the triggering position
+            if (gpPos.OrderApi__Role__c == 'Grand Praetor') {
+                data.gpName      = gpPos.OrderApi__Contact__r != null ? gpPos.OrderApi__Contact__r.Name : null;
+                data.gpEmail     = gpPos.OrderApi__Email__c;
+                data.gpContactId = gpPos.OrderApi__Contact__c;
+            } else if (gpPos.OrderApi__Role__c == 'Assistant Grand Praetor') {
+                data.agpName      = gpPos.OrderApi__Contact__r != null ? gpPos.OrderApi__Contact__r.Name : null;
+                data.agpEmail     = gpPos.OrderApi__Email__c;
+                data.agpContactId = gpPos.OrderApi__Contact__c;
+            }
+
+            // Chapter advisor
+            if (advisorByChapter.containsKey(gpPos.OrderApi__Account__c)) {
+                OrderApi__Position__c adv = advisorByChapter.get(gpPos.OrderApi__Account__c);
+                data.advisorName      = adv.OrderApi__Contact__r != null ? adv.OrderApi__Contact__r.Name : null;
+                data.advisorEmail     = adv.OrderApi__Email__c;
+                data.advisorRole      = adv.OrderApi__Role__c;
+                data.advisorContactId = adv.OrderApi__Contact__c;
+            }
+
             data.debugInfo       = 'OK|BalMap=' + balanceMap.size() + '|Bal=' + data.totalBalanceDue + '|Age=' + data.maxPostedAge;
 
             // Balance data from helper

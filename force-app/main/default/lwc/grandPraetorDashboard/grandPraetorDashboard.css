@@ -686,3 +686,44 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
     background: #fdf2e9;
     color: #784212;
 }
+
+/* ── Banner contact info (GP/AGP/Advisor) ── */
+.banner-contacts {
+    margin-top: 0.5rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.banner-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+}
+.banner-contact-label {
+    color: rgba(255,255,255,0.70);
+    font-weight: 600;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    min-width: 3rem;
+}
+.banner-contact-link {
+    color: #ffffff;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+.banner-contact-link:hover {
+    text-decoration: underline;
+}
+.banner-contact-email {
+    color: rgba(255,255,255,0.75);
+    display: flex;
+    align-items: center;
+}
+.banner-contact-email:hover {
+    color: #ffffff;
+}
