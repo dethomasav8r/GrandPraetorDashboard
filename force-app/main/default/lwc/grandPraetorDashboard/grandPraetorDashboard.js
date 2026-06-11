@@ -98,12 +98,19 @@ export default class GrandPraetorDashboard extends LightningElement {
 
     handleAlertChapterClick(event) {
         const chapterId = event.currentTarget.dataset.chapter;
-        const bucket    = '90+';
         const chapter   = this.dashboardData.find(c => c.chapterId === chapterId);
+
+        // Determine the correct bucket based on maxPostedAge
+        const age = chapter ? chapter.maxPostedAge : 0;
+        let bucket, bucketLabel;
+        if (age > 90)      { bucket = '90+';   bucketLabel = '90+ Days'; }
+        else if (age > 60) { bucket = '61-90'; bucketLabel = '61–90 Days'; }
+        else if (age > 30) { bucket = '31-60'; bucketLabel = '31–60 Days'; }
+        else               { bucket = '0-30';  bucketLabel = '0–30 Days'; }
 
         // Close the alert modal and open the lines modal
         this.showBalanceAlert   = false;
-        this.linesModalTitle    = (chapter ? chapter.chapterName + ' — ' : '') + '90+ Days';
+        this.linesModalTitle    = (chapter ? chapter.chapterName + ' — ' : '') + bucketLabel;
         this.linesModalLoading  = true;
         this.linesModalEmpty    = false;
         this.linesModalLines    = [];
