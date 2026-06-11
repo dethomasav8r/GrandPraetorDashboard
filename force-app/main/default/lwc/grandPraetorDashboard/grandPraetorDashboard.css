@@ -688,13 +688,23 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
 }
 
 /* ── Banner contact info (GP/AGP/Advisor) ── */
-.banner-contacts {
+.banner-contacts-row {
     margin-top: 0.5rem;
     padding-top: 0.4rem;
     border-top: 1px solid rgba(255,255,255,0.2);
     display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.banner-contacts-left,
+.banner-contacts-right {
+    display: flex;
     flex-direction: column;
     gap: 0.2rem;
+}
+.banner-contacts-right {
+    text-align: right;
+    align-items: flex-end;
 }
 .banner-contact-item {
     display: flex;

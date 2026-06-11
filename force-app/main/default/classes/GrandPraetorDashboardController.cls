@@ -34,6 +34,9 @@ public without sharing class GrandPraetorDashboardController {
         @AuraEnabled public String advisorEmail;
         @AuraEnabled public String advisorRole;
         @AuraEnabled public String advisorContactId;
+        @AuraEnabled public String asstAdvisorName;
+        @AuraEnabled public String asstAdvisorEmail;
+        @AuraEnabled public String asstAdvisorContactId;
         @AuraEnabled public Decimal totalBalanceDue;
         @AuraEnabled public Decimal due0to30;
         @AuraEnabled public Decimal due31to60;
@@ -266,14 +269,22 @@ public without sharing class GrandPraetorDashboardController {
                   AND OrderApi__Status__c = 'Active'
                   AND OrderApi__Role__c IN ('Chapter Advisor', 'Greek Advisor',
                                             'Faculty Advisor', 'Assistant Chapter Advisor')
+                ORDER BY OrderApi__Role__c ASC
             ];
         } catch(Exception e) {
             advisorPositions = new List<OrderApi__Position__c>();
         }
         Map<Id, OrderApi__Position__c> advisorByChapter = new Map<Id, OrderApi__Position__c>();
+        Map<Id, OrderApi__Position__c> asstAdvisorByChapter = new Map<Id, OrderApi__Position__c>();
         for (OrderApi__Position__c ap : advisorPositions) {
-            if (!advisorByChapter.containsKey(ap.OrderApi__Account__c)) {
-                advisorByChapter.put(ap.OrderApi__Account__c, ap);
+            if (ap.OrderApi__Role__c == 'Assistant Chapter Advisor') {
+                if (!asstAdvisorByChapter.containsKey(ap.OrderApi__Account__c)) {
+                    asstAdvisorByChapter.put(ap.OrderApi__Account__c, ap);
+                }
+            } else {
+                if (!advisorByChapter.containsKey(ap.OrderApi__Account__c)) {
+                    advisorByChapter.put(ap.OrderApi__Account__c, ap);
+                }
             }
         }
 
@@ -345,8 +356,14 @@ public without sharing class GrandPraetorDashboardController {
                 data.advisorRole      = adv.OrderApi__Role__c;
                 data.advisorContactId = adv.OrderApi__Contact__c;
             }
+            if (asstAdvisorByChapter.containsKey(gpPos.OrderApi__Account__c)) {
+                OrderApi__Position__c aadv = asstAdvisorByChapter.get(gpPos.OrderApi__Account__c);
+                data.asstAdvisorName      = aadv.OrderApi__Contact__r != null ? aadv.OrderApi__Contact__r.Name : null;
+                data.asstAdvisorEmail     = aadv.OrderApi__Email__c;
+                data.asstAdvisorContactId = aadv.OrderApi__Contact__c;
+            }
 
-            data.debugInfo       = 'OK|BalMap=' + balanceMap.size() + '|Bal=' + data.totalBalanceDue + '|Age=' + data.maxPostedAge;
+            data.debugInfo       = 'OK|BalMap=' + balanceMap.size() + '|Bal=' + data.totalBalanceDue + '|Age=' + data.maxPostedAge + '|GP=' + data.gpName + '|Adv=' + data.advisorName;
 
             // Balance data from helper
             GrandPraetorBalanceHelper.BalanceResult br = balanceMap.containsKey(gpPos.OrderApi__Account__c)

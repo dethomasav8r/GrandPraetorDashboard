@@ -68,40 +68,55 @@
                                     <span class="meta-badge balance-badge">{chapter.formattedBalance} total due</span>
                                 </template>
                             </div>
-                            <div class="banner-contacts">
-                                <template if:true={chapter.gpName}>
-                                    <div class="banner-contact-item">
-                                        <span class="banner-contact-label">GP:</span>
-                                        <a onclick={handleContactClick} data-contactid={chapter.gpContactId} class="banner-contact-link">{chapter.gpName}</a>
-                                        <template if:true={chapter.gpEmailLink}>
-                                            <a href={chapter.gpEmailLink} class="banner-contact-email" title={chapter.gpEmail}>
-                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
-                                            </a>
-                                        </template>
-                                    </div>
-                                </template>
-                                <template if:true={chapter.agpName}>
-                                    <div class="banner-contact-item">
-                                        <span class="banner-contact-label">AGP:</span>
-                                        <a onclick={handleContactClick} data-contactid={chapter.agpContactId} class="banner-contact-link">{chapter.agpName}</a>
-                                        <template if:true={chapter.agpEmailLink}>
-                                            <a href={chapter.agpEmailLink} class="banner-contact-email" title={chapter.agpEmail}>
-                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
-                                            </a>
-                                        </template>
-                                    </div>
-                                </template>
-                                <template if:true={chapter.advisorName}>
-                                    <div class="banner-contact-item">
-                                        <span class="banner-contact-label">Advisor:</span>
-                                        <a onclick={handleContactClick} data-contactid={chapter.advisorContactId} class="banner-contact-link">{chapter.advisorName}</a>
-                                        <template if:true={chapter.advisorEmailLink}>
-                                            <a href={chapter.advisorEmailLink} class="banner-contact-email" title={chapter.advisorEmail}>
-                                                <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
-                                            </a>
-                                        </template>
-                                    </div>
-                                </template>
+                            <div class="banner-contacts-row">
+                                <div class="banner-contacts-left">
+                                    <template if:true={chapter.gpName}>
+                                        <div class="banner-contact-item">
+                                            <span class="banner-contact-label">GP:</span>
+                                            <a onclick={handleContactClick} data-contactid={chapter.gpContactId} class="banner-contact-link">{chapter.gpName}</a>
+                                            <template if:true={chapter.gpEmailLink}>
+                                                <a href={chapter.gpEmailLink} class="banner-contact-email" title={chapter.gpEmail}>
+                                                    <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:true={chapter.agpName}>
+                                        <div class="banner-contact-item">
+                                            <span class="banner-contact-label">AGP:</span>
+                                            <a onclick={handleContactClick} data-contactid={chapter.agpContactId} class="banner-contact-link">{chapter.agpName}</a>
+                                            <template if:true={chapter.agpEmailLink}>
+                                                <a href={chapter.agpEmailLink} class="banner-contact-email" title={chapter.agpEmail}>
+                                                    <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="banner-contacts-right">
+                                    <template if:true={chapter.advisorName}>
+                                        <div class="banner-contact-item">
+                                            <span class="banner-contact-label">Advisor:</span>
+                                            <a onclick={handleContactClick} data-contactid={chapter.advisorContactId} class="banner-contact-link">{chapter.advisorName}</a>
+                                            <template if:true={chapter.advisorEmailLink}>
+                                                <a href={chapter.advisorEmailLink} class="banner-contact-email" title={chapter.advisorEmail}>
+                                                    <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:true={chapter.asstAdvisorName}>
+                                        <div class="banner-contact-item">
+                                            <span class="banner-contact-label">Asst Advisor:</span>
+                                            <a onclick={handleContactClick} data-contactid={chapter.asstAdvisorContactId} class="banner-contact-link">{chapter.asstAdvisorName}</a>
+                                            <template if:true={chapter.asstAdvisorEmailLink}>
+                                                <a href={chapter.asstAdvisorEmailLink} class="banner-contact-email" title={chapter.asstAdvisorEmail}>
+                                                    <lightning-icon icon-name="utility:email" size="xx-small"></lightning-icon>
+                                                </a>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                             <template if:true={chapter.hasBalance}>
                                 <div class="aging-buckets">

@@ -32,7 +32,8 @@ export default class GrandPraetorDashboard extends LightningElement {
         getDashboardData()
             .then(result => {
                 this.debugMessage = 'Apex returned ' + (result ? result.length : 'null') + ' records'
-                    + (result && result[0] && result[0].debugInfo ? ' | ch1=' + result[0].chapterName + ':' + result[0].debugInfo : '');
+                    + (result && result[0] && result[0].debugInfo ? ' | ch1=' + result[0].chapterName + ':' + result[0].debugInfo : '') 
+                    + (result && result[0] ? ' | gpName=' + result[0].gpName + ' | advisor=' + result[0].advisorName : '');
 
                 if (result && result.length > 0 && result[0].chapterId !== 'DEBUG') {
                     this.dashboardData = this.processData(result);
@@ -258,9 +259,10 @@ export default class GrandPraetorDashboard extends LightningElement {
                 hasMemberEmails: memberEmails.length > 0,
                 memberMailtoLink: memberEmails.length > 0 ? `mailto:${memberEmails.join(',')}` : null,
                 formattedFoundingDate,
-                gpEmailLink:       this.isValidEmail(chapter.gpEmail) ? `mailto:${chapter.gpEmail}` : null,
-                agpEmailLink:      this.isValidEmail(chapter.agpEmail) ? `mailto:${chapter.agpEmail}` : null,
-                advisorEmailLink:  this.isValidEmail(chapter.advisorEmail) ? `mailto:${chapter.advisorEmail}` : null,
+                gpEmailLink:           this.isValidEmail(chapter.gpEmail) ? `mailto:${chapter.gpEmail}` : null,
+                agpEmailLink:          this.isValidEmail(chapter.agpEmail) ? `mailto:${chapter.agpEmail}` : null,
+                advisorEmailLink:      this.isValidEmail(chapter.advisorEmail) ? `mailto:${chapter.advisorEmail}` : null,
+                asstAdvisorEmailLink:  this.isValidEmail(chapter.asstAdvisorEmail) ? `mailto:${chapter.asstAdvisorEmail}` : null,
                 formattedBalance: this.formatCurrency(chapter.totalBalanceDue),
                 formatted0to30:   this.formatCurrency(chapter.due0to30),
                 formatted31to60:  this.formatCurrency(chapter.due31to60),
