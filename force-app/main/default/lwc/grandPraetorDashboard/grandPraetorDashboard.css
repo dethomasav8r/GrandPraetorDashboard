@@ -11,7 +11,7 @@
     text-align: center;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #003087 0%, #C5A028 100%);
+    background: linear-gradient(135deg, #00A3E0 0%, #FEC141 100%);
     border-radius: 12px;
     color: #ffffff;
 }
@@ -71,7 +71,7 @@
 
 /* ── Chapter Card Header ── */
 .chapter-card-header {
-    background: linear-gradient(135deg, #1a2e4a 0%, #243d5c 100%);
+    background: linear-gradient(135deg, #002B49 0%, #003D5C 100%);
     padding: 1.25rem 1.5rem;
     color: #ffffff;
 }
@@ -144,7 +144,7 @@
     margin-top: 0.2rem;
     text-align: center;
 }
-.stat-alumni .stat-number    { color: #1a2e4a; }
+.stat-alumni .stat-number    { color: #002B49; }
 .stat-undergrad .stat-number { color: #1a7f4b; }
 .stat-pledge .stat-number    { color: #c8102e; }
 .stat-pnm .stat-number       { color: #e67e22; }
@@ -186,7 +186,7 @@
 .panel-title {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #1a2e4a;
+    color: #002B49;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -204,7 +204,7 @@
     gap: 0.2rem;
     padding: 0.2rem 0.5rem;
     border-radius: 999px;
-    background: #1a2e4a;
+    background: #002B49;
     color: #ffffff;
     font-size: 0.65rem;
     font-weight: 600;
@@ -246,7 +246,7 @@
 .row-name {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #1a2e4a;
+    color: #002B49;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -294,7 +294,7 @@
     cursor: pointer;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #003087;
+    color: #00A3E0;
     text-align: left;
     text-decoration: underline;
     text-decoration-style: dotted;
@@ -304,7 +304,7 @@
     white-space: nowrap;
     max-width: 100%;
 }
-.contact-link:hover { color: #C5A028; }
+.contact-link:hover { color: #FEC141; }
 
 /* ── Modal Backdrop ── */
 .modal-backdrop {
@@ -335,7 +335,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.25rem;
-    background: linear-gradient(135deg, #1a2e4a 0%, #243d5c 100%);
+    background: linear-gradient(135deg, #002B49 0%, #003D5C 100%);
     color: #ffffff;
 }
 .modal-header-left {
@@ -400,12 +400,12 @@
 }
 .modal-value {
     font-size: 0.85rem;
-    color: #1a2e4a;
+    color: #002B49;
     font-weight: 500;
     word-break: break-word;
     text-decoration: none;
 }
-a.modal-value:hover { color: #003087; text-decoration: underline; }
+a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
 
 /* ── Chapter Header Meta (founding date + address) ── */
 .chapter-header-meta {
@@ -429,7 +429,7 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
 
 /* ── Banner Color Variants ── */
 .banner-green {
-    background: linear-gradient(135deg, #1a2e4a 0%, #243d5c 100%);
+    background: linear-gradient(135deg, #002B49 0%, #003D5C 100%);
     padding: 1.25rem 1.5rem;
     color: #ffffff;
 }
@@ -491,7 +491,7 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
 .alert-chapter-name {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #1a2e4a;
+    color: #002B49;
 }
 .alert-chapter-school {
     font-size: 0.75rem;
@@ -531,8 +531,8 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
     background: rgba(255,255,255,0.1);
 }
 .aging-bucket-0to30  { background: rgba(39,174,96,0.50) !important; }
-.aging-bucket-31to60 { background: rgba(197,160,40,0.50) !important; }
-.aging-bucket-61to90 { background: rgba(197,160,40,0.75) !important; }
+.aging-bucket-31to60 { background: rgba(254,193,65,0.50) !important; }
+.aging-bucket-61to90 { background: rgba(254,193,65,0.75) !important; }
 .aging-bucket-90plus { background: rgba(200,16,46,0.75) !important; }
 .aging-bucket-red    { background: rgba(200,16,46,0.75) !important; }
 .aging-label {
@@ -568,7 +568,7 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
 
 /* ── Detail Panel ── */
 .detail-panel {
-    border-top: 2px solid #C5A028;
+    border-top: 2px solid #FEC141;
     background: #f8f9fc;
     padding: 1rem 1.25rem;
 }
@@ -581,7 +581,7 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
 .detail-title {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #1a2e4a;
+    color: #002B49;
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
@@ -606,7 +606,7 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
     font-size: 0.78rem;
 }
 .lines-table th {
-    background: #003087;
+    background: #00A3E0;
     color: #ffffff;
     text-align: left;
     padding: 0.4rem 0.6rem;
@@ -618,7 +618,7 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
 .lines-table td {
     padding: 0.35rem 0.6rem;
     border-bottom: 1px solid #e0e5eb;
-    color: #1a2e4a;
+    color: #002B49;
     vertical-align: top;
 }
 .lines-table tr:hover td { background: #f0f4f8; }
@@ -633,7 +633,7 @@ a.modal-value:hover { color: #003087; text-decoration: underline; }
     max-width: 1000px;
 }
 .lines-modal-header {
-    background: linear-gradient(135deg, #003087 0%, #1a5276 100%);
+    background: linear-gradient(135deg, #00A3E0 0%, #1a5276 100%);
 }
 .lines-modal-body {
     padding: 0;
