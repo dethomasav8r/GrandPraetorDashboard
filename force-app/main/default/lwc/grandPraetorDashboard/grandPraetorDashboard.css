@@ -530,7 +530,7 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
     padding: 0.35rem 0.4rem;
     background: rgba(255,255,255,0.1);
 }
-.aging-bucket-0to30  { background: rgba(0,163,224,0.60) !important; }    /* brand blue #00A3E0 */
+.aging-bucket-0to30  { background: rgba(39,174,96,0.60) !important; }    /* green */
 .aging-bucket-31to60 { background: rgba(254,193,65,0.55) !important; }     /* brand gold #FEC141 */
 .aging-bucket-61to90 { background: rgba(254,193,65,0.80) !important; }     /* brand gold darker */
 .aging-bucket-90plus { background: rgba(200,16,46,0.75) !important; }      /* red */
