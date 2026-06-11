@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>67.0</apiVersion>
+    <apiVersion>66.0</apiVersion>
     <description>Automatically assigns or removes the GrandPraetorDashboardAccess permission set when a Grand Praetor badge is activated or deactivated.</description>
     <label>GP Badge Permission Set Assignment</label>
     <processMetadataValues>

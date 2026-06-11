@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>67.0</apiVersion>
+    <apiVersion>66.0</apiVersion>
     <description>Assigns or removes GrandPraetorDashboardAccess when a Grand Praetor Position is activated or deactivated. Uses async Apex to avoid MIXED_DML errors.</description>
     <label>GP Position Permission Set Assignment</label>
     <processMetadataValues>

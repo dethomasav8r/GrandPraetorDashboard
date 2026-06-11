@@ -1,62 +1,235 @@
 @isTest
 private class GrandPraetorDashboardControllerTest {
 
-    // ── Tests ─────────────────────────────────────────────────────────────────
+    // ── Shared test data ──────────────────────────────────────────────────────
+    @testSetup
+    static void setupTestData() {
+        // Account
+        Account a = new Account(Name = 'Test Chapter Coverage');
+        insert a;
+
+        // Contact with FirstName to satisfy org flows
+        Contact c = new Contact(
+            FirstName         = 'Test',
+            LastName          = 'GPCoverage',
+            AccountId         = a.Id,
+            Email             = 'testgpcoverage@test.org',
+            Phone             = '555-555-5555',
+            MobilePhone       = '555-555-5556',
+            MailingStreet     = '123 Main St',
+            MailingCity       = 'Nashville',
+            MailingStateCode  = 'TN',
+            MailingCountryCode = 'US',
+            MailingPostalCode = '37201'
+        );
+        insert c;
+
+        // Member Information (required for Position)
+        OrderApi__Member_Information__c mi = new OrderApi__Member_Information__c(
+            OrderApi__Member__c  = c.Id,
+            OrderApi__Chapter__c = a.Id
+        );
+        insert mi;
+
+        // GP Position
+        OrderApi__Position__c pos = new OrderApi__Position__c(
+            OrderApi__Contact__c            = c.Id,
+            OrderApi__Account__c            = a.Id,
+            OrderApi__Role__c               = 'Grand Praetor',
+            OrderApi__Member_Information__c = mi.Id,
+            OrderApi__Start_Date__c         = Date.today()
+        );
+        insert pos;
+
+        // AGP Position on same contact/account
+        OrderApi__Position__c agpPos = new OrderApi__Position__c(
+            OrderApi__Contact__c            = c.Id,
+            OrderApi__Account__c            = a.Id,
+            OrderApi__Role__c               = 'Assistant Grand Praetor',
+            OrderApi__Member_Information__c = mi.Id,
+            OrderApi__Start_Date__c         = Date.today()
+        );
+        insert agpPos;
+    }
+
+    // ── getDashboardData ──────────────────────────────────────────────────────
 
     @isTest
-    static void testGetDashboardDataNoContact() {
-        // Running as internal admin with no ContactId → returns non-null list
+    static void testGetDashboardDataAsAdmin() {
+        // Admin user has no ContactId — returns non-null list
         List<GrandPraetorDashboardController.ChapterDashboardData> result =
             GrandPraetorDashboardController.getDashboardData();
         System.assertNotEquals(null, result, 'Should not be null');
-        System.assert(result.size() >= 0, 'Should return valid list');
+        System.assert(result.size() >= 0, 'Should return a valid list');
+    }
+
+    // ── getContactDetail ──────────────────────────────────────────────────────
+
+    @isTest
+    static void testGetContactDetailValid() {
+        Contact c = [SELECT Id FROM Contact WHERE LastName = 'GPCoverage' LIMIT 1];
+        GrandPraetorDashboardController.ContactDetail cd =
+            GrandPraetorDashboardController.getContactDetail(c.Id);
+        System.assertNotEquals(null, cd, 'Should return contact detail');
+        System.assert(cd.name.contains('Test'), 'Name should contain first name');
+        System.assertEquals('555-555-5555', cd.phone, 'Phone should match');
+        System.assertEquals('Nashville', cd.mailingCity, 'City should match');
     }
 
     @isTest
-    static void testGetOrderLinesInvalidChapter() {
-        // No GP position on a fake account → returns empty
+    static void testGetContactDetailInvalid() {
+        // Fake ID → returns null without throwing
+        GrandPraetorDashboardController.ContactDetail cd =
+            GrandPraetorDashboardController.getContactDetail('003000000000000AAA');
+        System.assertEquals(null, cd, 'Invalid ID should return null');
+    }
+
+    // ── getOrderLines ─────────────────────────────────────────────────────────
+
+    @isTest
+    static void testGetOrderLinesNoPosition() {
         List<GrandPraetorDashboardController.OrderLineData> lines =
-            GrandPraetorDashboardController.getOrderLines(
-                '001000000000000AAA', '90+'
-            );
+            GrandPraetorDashboardController.getOrderLines('001000000000000AAA', '90+');
         System.assertNotEquals(null, lines, 'Should not be null');
         System.assertEquals(0, lines.size(), 'No position — should be empty');
     }
 
     @isTest
-    static void testGetOrderLinesBuckets() {
-        // Verify all bucket values are accepted without exception
-        for (String bucket : new List<String>{'0-30','31-60','61-90','90+'}) {
-            List<GrandPraetorDashboardController.OrderLineData> lines =
-                GrandPraetorDashboardController.getOrderLines(
-                    '001000000000000AAA', bucket
-                );
-            System.assertNotEquals(null, lines, 'Bucket ' + bucket + ' should not be null');
-        }
+    static void testGetOrderLinesBucket0to30() {
+        List<GrandPraetorDashboardController.OrderLineData> lines =
+            GrandPraetorDashboardController.getOrderLines('001000000000000AAA', '0-30');
+        System.assertNotEquals(null, lines, 'Should not be null');
     }
+
+    @isTest
+    static void testGetOrderLinesBucket31to60() {
+        List<GrandPraetorDashboardController.OrderLineData> lines =
+            GrandPraetorDashboardController.getOrderLines('001000000000000AAA', '31-60');
+        System.assertNotEquals(null, lines, 'Should not be null');
+    }
+
+    @isTest
+    static void testGetOrderLinesBucket61to90() {
+        List<GrandPraetorDashboardController.OrderLineData> lines =
+            GrandPraetorDashboardController.getOrderLines('001000000000000AAA', '61-90');
+        System.assertNotEquals(null, lines, 'Should not be null');
+    }
+
+    // ── GrandPraetorBalanceHelper ─────────────────────────────────────────────
 
     @isTest
     static void testBalanceHelperEmpty() {
-        Set<Id> emptyIds = new Set<Id>();
         List<GrandPraetorBalanceHelper.BalanceResult> results =
-            GrandPraetorBalanceHelper.getBalances(emptyIds);
-        System.assertNotEquals(null, results, 'Should not be null');
-        System.assertEquals(0, results.size(), 'Empty input → empty output');
+            GrandPraetorBalanceHelper.getBalances(new Set<Id>());
+        System.assertNotEquals(null, results);
+        System.assertEquals(0, results.size());
     }
 
     @isTest
-    static void testBalanceHelperWithIds() {
-        // Pass real-looking IDs — no Sales Orders exist in test so returns empty
-        Set<Id> ids = new Set<Id>{'001000000000001AAA', '001000000000002AAA'};
+    static void testBalanceHelperWithAccount() {
+        Account a = [SELECT Id FROM Account WHERE Name = 'Test Chapter Coverage' LIMIT 1];
         List<GrandPraetorBalanceHelper.BalanceResult> results =
-            GrandPraetorBalanceHelper.getBalances(ids);
+            GrandPraetorBalanceHelper.getBalances(new Set<Id>{ a.Id });
         System.assertNotEquals(null, results, 'Should not be null');
-        System.assert(results.size() >= 0, 'Should return valid list');
+        System.assert(results.size() >= 0, 'Valid list expected');
     }
+
+    @isTest
+    static void testBalanceResultConstructor() {
+        Account a = [SELECT Id FROM Account WHERE Name = 'Test Chapter Coverage' LIMIT 1];
+        GrandPraetorBalanceHelper.BalanceResult br =
+            new GrandPraetorBalanceHelper.BalanceResult(a.Id);
+        System.assertEquals(a.Id, br.accountId);
+        System.assertEquals(0, br.totalBalance);
+        System.assertEquals(0, br.due0to30);
+        System.assertEquals(0, br.due31to60);
+        System.assertEquals(0, br.due61to90);
+        System.assertEquals(0, br.due90Plus);
+        System.assertEquals(0, br.maxAge);
+    }
+
+    // ── Inner class structure ─────────────────────────────────────────────────
+
+    @isTest
+    static void testOrderLineDataStructure() {
+        GrandPraetorDashboardController.OrderLineData d =
+            new GrandPraetorDashboardController.OrderLineData();
+        d.salesOrderId   = '8010000000000001AAA';
+        d.salesOrderName = '000001234';
+        d.itemName       = 'Test Fee';
+        d.balanceDue     = 100.00;
+        d.amountPaid     = 50.00;
+        d.quantity       = 1;
+        d.total          = 150.00;
+        d.contactName    = 'Test Contact';
+        System.assertEquals(100.00, d.balanceDue);
+        System.assertEquals(50.00, d.amountPaid);
+        System.assertEquals('Test Fee', d.itemName);
+    }
+
+    @isTest
+    static void testChapterDashboardDataStructure() {
+        GrandPraetorDashboardController.ChapterDashboardData d =
+            new GrandPraetorDashboardController.ChapterDashboardData();
+        d.chapterId      = '001000000000001AAA';
+        d.chapterName    = 'Test';
+        d.totalBalanceDue = 500.00;
+        d.due0to30       = 100.00;
+        d.due31to60      = 100.00;
+        d.due61to90      = 100.00;
+        d.due90Plus      = 200.00;
+        d.maxPostedAge   = 95;
+        d.balanceStatus  = 'RED';
+        d.isAlumniChapter = false;
+        d.activeUndergrads = new List<GrandPraetorDashboardController.MemberSummary>();
+        d.activePledges    = new List<GrandPraetorDashboardController.MemberSummary>();
+        d.activeMembers    = new List<GrandPraetorDashboardController.MemberSummary>();
+        d.chapterOfficers  = new List<GrandPraetorDashboardController.OfficerSummary>();
+        System.assertEquals('RED', d.balanceStatus);
+        System.assertEquals(500.00, d.totalBalanceDue);
+    }
+
+    @isTest
+    static void testMemberSummaryStructure() {
+        GrandPraetorDashboardController.MemberSummary m =
+            new GrandPraetorDashboardController.MemberSummary();
+        m.memberId   = '003000000000001AAA';
+        m.memberName = 'John Doe';
+        m.memberType = 'Undergraduate';
+        m.email      = 'john@test.org';
+        System.assertEquals('John Doe', m.memberName);
+        System.assertEquals('Undergraduate', m.memberType);
+    }
+
+    @isTest
+    static void testOfficerSummaryStructure() {
+        GrandPraetorDashboardController.OfficerSummary o =
+            new GrandPraetorDashboardController.OfficerSummary();
+        o.positionId  = '300000000000001AAA';
+        o.officerName = 'Jane Smith';
+        o.role        = 'Consul';
+        o.sortOrder   = 1;
+        System.assertEquals('Consul', o.role);
+        System.assertEquals(1, o.sortOrder);
+    }
+
+    @isTest
+    static void testContactDetailStructure() {
+        GrandPraetorDashboardController.ContactDetail cd =
+            new GrandPraetorDashboardController.ContactDetail();
+        cd.contactId     = '003000000000001AAA';
+        cd.name          = 'Test User';
+        cd.phone         = '555-1234';
+        cd.mailingCity   = 'Nashville';
+        cd.mailingState  = 'Tennessee';
+        System.assertEquals('Test User', cd.name);
+        System.assertEquals('Nashville', cd.mailingCity);
+    }
+
+    // ── PermSetAssignmentQueueable ────────────────────────────────────────────
 
     @isTest
     static void testPermSetQueueableAssign() {
-        // Verify assign=true runs without error
         User u = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()];
         PermissionSet ps = [SELECT Id FROM PermissionSet
                             WHERE Name = 'GrandPraetorDashboardAccess' LIMIT 1];
@@ -68,7 +241,6 @@ private class GrandPraetorDashboardControllerTest {
 
     @isTest
     static void testPermSetQueueableRemove() {
-        // Verify assign=false runs without error
         User u = [SELECT Id FROM User WHERE Id = :UserInfo.getUserId()];
         PermissionSet ps = [SELECT Id FROM PermissionSet
                             WHERE Name = 'GrandPraetorDashboardAccess' LIMIT 1];
@@ -76,22 +248,5 @@ private class GrandPraetorDashboardControllerTest {
         System.enqueueJob(new PermSetAssignmentQueueable(u.Id, ps.Id, false));
         Test.stopTest();
         System.assert(true, 'Remove queueable ran without error');
-    }
-
-    @isTest
-    static void testOrderLineDataStructure() {
-        // Verify inner class can be instantiated
-        GrandPraetorDashboardController.OrderLineData d =
-            new GrandPraetorDashboardController.OrderLineData();
-        d.salesOrderId   = '8010000000000001AAA';
-        d.salesOrderName = '000001234';
-        d.itemName       = 'Test Fee';
-        d.balanceDue     = 100.00;
-        d.amountPaid     = 50.00;
-        d.quantity       = 1;
-        d.total          = 150.00;
-        d.contactName    = 'Test Contact';
-        System.assertEquals(100.00, d.balanceDue, 'Balance due should be set');
-        System.assertEquals(50.00, d.amountPaid, 'Amount paid should be set');
     }
 }
