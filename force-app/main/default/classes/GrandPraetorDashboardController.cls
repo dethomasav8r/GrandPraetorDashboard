@@ -246,6 +246,7 @@ public without sharing class GrandPraetorDashboardController {
                        OrderApi__Contact__c,
                        OrderApi__Contact__r.Name,
                        OrderApi__Contact__r.Initiation_Date__c,
+                       OrderApi__Contact__r.Member_Type__c,
                        OrderApi__Email__c
                 FROM OrderApi__Position__c
                 WHERE OrderApi__Account__c IN :chapterIds
@@ -491,6 +492,10 @@ public without sharing class GrandPraetorDashboardController {
             for (OrderApi__Position__c op : chapterOfficers) {
                 // Exclude Alumni Chapter Member from non-alumni chapters
                 if (op.OrderApi__Role__c == 'Alumni Chapter Member' && !isAlumni) continue;
+                // For undergrad chapters, only show Undergrad member type officers
+                if (!isAlumni && op.OrderApi__Contact__r != null
+                    && op.OrderApi__Contact__r.Member_Type__c != null
+                    && op.OrderApi__Contact__r.Member_Type__c != 'Undergrad') continue;
                 // Exclude university staff roles
                 if (op.OrderApi__Role__c == 'University President' ||
                     op.OrderApi__Role__c == 'University Vice President' ||
