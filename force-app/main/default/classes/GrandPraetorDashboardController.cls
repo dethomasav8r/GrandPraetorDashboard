@@ -44,6 +44,38 @@ public without sharing class GrandPraetorDashboardController {
         @AuraEnabled public Decimal due90Plus;
         @AuraEnabled public Integer maxPostedAge;
         @AuraEnabled public String balanceStatus; // GREEN, YELLOW, AMBER, RED
+        @AuraEnabled public String provinceId;
+        @AuraEnabled public String provinceName;
+        @AuraEnabled public List<MentorSummary> provinceMentors;
+        @AuraEnabled public List<RitualPeerSummary> ritualPeers;
+    }
+
+    public class RitualPeerSummary {
+        @AuraEnabled public String positionId;
+        @AuraEnabled public String peerName;
+        @AuraEnabled public String contactId;
+    }
+
+    public class MentorSummary {
+        @AuraEnabled public String positionId;
+        @AuraEnabled public String mentorName;
+        @AuraEnabled public String role;
+        @AuraEnabled public String mentoring;
+        @AuraEnabled public String phone;
+        @AuraEnabled public String email;
+        @AuraEnabled public String contactId;
+        @AuraEnabled public Integer sortOrder;
+    }
+
+    public class MentorComparator implements Comparator<MentorSummary> {
+        public Integer compare(MentorSummary a, MentorSummary b) {
+            if (a.sortOrder != b.sortOrder) return a.sortOrder - b.sortOrder;
+            String nameA = a.mentorName != null ? a.mentorName.toLowerCase() : '';
+            String nameB = b.mentorName != null ? b.mentorName.toLowerCase() : '';
+            if (nameA < nameB) return -1;
+            if (nameA > nameB) return 1;
+            return 0;
+        }
     }
 
     public class MemberSummary {
@@ -129,6 +161,27 @@ public without sharing class GrandPraetorDashboardController {
         return 50;
     }
 
+    // "Transform Pro-Consul Mentor" -> "Pro-Consul"
+    private static String mentoringLabel(String role) {
+        if (role == null) return null;
+        String r = role.removeStart('Transform ').removeEnd(' Mentor');
+        return r.trim();
+    }
+
+    private static Integer mentorSort(String role) {
+        String r = mentoringLabel(role);
+        if (r == null) return 99;
+        r = r.toLowerCase();
+        if (r == 'consul')       return 1;
+        if (r == 'pro-consul')   return 2;
+        if (r == 'quaestor')     return 3;
+        if (r == 'magister')     return 4;
+        if (r == 'recruitment')  return 5;
+        if (r == 'kustos')       return 6;
+        if (r == 'risk')         return 7;
+        return 50;
+    }
+
     private static Integer alumniOfficerSort(String role) {
         if (role == null) return 99;
         String r = role.toLowerCase();
@@ -195,7 +248,10 @@ public without sharing class GrandPraetorDashboardController {
                        OrderApi__Account__r.BillingPostalCode,
                        OrderApi__Account__r.Type,
                        OrderApi__Account__r.RecordType.Name,
-                       OrderApi__Account__r.OrderApi__Chapter_Status__c
+                       OrderApi__Account__r.OrderApi__Chapter_Status__c,
+                       OrderApi__Account__r.ParentId,
+                       OrderApi__Account__r.Parent.Name,
+                       OrderApi__Account__r.Parent.RecordType.Name
                 FROM OrderApi__Position__c
                 WHERE OrderApi__Contact__c = :contactId
                   AND OrderApi__Role__c IN ('Grand Praetor', 'Assistant Grand Praetor')
@@ -289,6 +345,80 @@ public without sharing class GrandPraetorDashboardController {
             }
         }
 
+        // Transform officer mentors held on the Province account (one list per province)
+        Set<Id> provinceIds = new Set<Id>();
+        for (OrderApi__Position__c pos : gpPositions) {
+            Account acct = pos.OrderApi__Account__r;
+            if (acct != null && acct.ParentId != null && acct.Parent != null
+                && acct.Parent.RecordType != null && acct.Parent.RecordType.Name == 'Province') {
+                provinceIds.add(acct.ParentId);
+            }
+        }
+        Map<Id, List<MentorSummary>> mentorsByProvince = new Map<Id, List<MentorSummary>>();
+        if (!provinceIds.isEmpty()) {
+            try {
+                for (OrderApi__Position__c mp : [
+                    SELECT Id, OrderApi__Account__c, OrderApi__Role__c,
+                           OrderApi__Contact__c, OrderApi__Contact__r.Name,
+                           OrderApi__Contact__r.Phone, OrderApi__Contact__r.MobilePhone,
+                           OrderApi__Contact__r.OrderApi__Preferred_Phone__c,
+                           OrderApi__Contact__r.Email,
+                           OrderApi__Contact__r.OrderApi__Preferred_Email__c,
+                           OrderApi__Email__c, OrderApi__Phone__c
+                    FROM OrderApi__Position__c
+                    WHERE OrderApi__Account__c IN :provinceIds
+                      AND OrderApi__Status__c = 'Active'
+                      AND OrderApi__Role__c LIKE 'Transform%Mentor'
+                ]) {
+                    Contact mc = mp.OrderApi__Contact__r;
+                    MentorSummary ms = new MentorSummary();
+                    ms.positionId = mp.Id;
+                    ms.mentorName = mc != null ? mc.Name : null;
+                    ms.role       = mp.OrderApi__Role__c;
+                    ms.mentoring  = mentoringLabel(mp.OrderApi__Role__c);
+                    ms.contactId  = mp.OrderApi__Contact__c;
+                    ms.phone      = mc != null && String.isNotBlank(mc.OrderApi__Preferred_Phone__c) ? mc.OrderApi__Preferred_Phone__c
+                                  : mc != null && String.isNotBlank(mc.Phone) ? mc.Phone
+                                  : mc != null && String.isNotBlank(mc.MobilePhone) ? mc.MobilePhone
+                                  : mp.OrderApi__Phone__c;
+                    ms.email      = String.isNotBlank(mp.OrderApi__Email__c) ? mp.OrderApi__Email__c
+                                  : mc != null && String.isNotBlank(mc.OrderApi__Preferred_Email__c) ? mc.OrderApi__Preferred_Email__c
+                                  : mc != null ? mc.Email : null;
+                    ms.sortOrder  = mentorSort(mp.OrderApi__Role__c);
+                    if (!mentorsByProvince.containsKey(mp.OrderApi__Account__c)) {
+                        mentorsByProvince.put(mp.OrderApi__Account__c, new List<MentorSummary>());
+                    }
+                    mentorsByProvince.get(mp.OrderApi__Account__c).add(ms);
+                }
+            } catch(Exception e) { }
+            for (List<MentorSummary> ml : mentorsByProvince.values()) ml.sort(new MentorComparator());
+        }
+
+        // Active Ritual Peers per chapter (a chapter can have several)
+        Map<Id, List<RitualPeerSummary>> ritualPeersByChapter = new Map<Id, List<RitualPeerSummary>>();
+        try {
+            Set<String> seen = new Set<String>();
+            for (OrderApi__Position__c rp : [
+                SELECT Id, OrderApi__Account__c, OrderApi__Contact__c, OrderApi__Contact__r.Name
+                FROM OrderApi__Position__c
+                WHERE OrderApi__Account__c IN :chapterIds
+                  AND OrderApi__Status__c = 'Active'
+                  AND OrderApi__Role__c = 'Ritual Peer'
+                ORDER BY OrderApi__Contact__r.Name ASC
+            ]) {
+                if (rp.OrderApi__Contact__r == null) continue;
+                if (!seen.add(rp.OrderApi__Account__c + '|' + rp.OrderApi__Contact__c)) continue;
+                RitualPeerSummary rs = new RitualPeerSummary();
+                rs.positionId = rp.Id;
+                rs.peerName   = rp.OrderApi__Contact__r.Name;
+                rs.contactId  = rp.OrderApi__Contact__c;
+                if (!ritualPeersByChapter.containsKey(rp.OrderApi__Account__c)) {
+                    ritualPeersByChapter.put(rp.OrderApi__Account__c, new List<RitualPeerSummary>());
+                }
+                ritualPeersByChapter.get(rp.OrderApi__Account__c).add(rs);
+            }
+        } catch(Exception e) { }
+
         // Use helper class to get balance aging buckets
         Map<Id, GrandPraetorBalanceHelper.BalanceResult> balanceMap =
             new Map<Id, GrandPraetorBalanceHelper.BalanceResult>();
@@ -353,6 +483,15 @@ public without sharing class GrandPraetorDashboardController {
             data.chapterType     = gpPos.OrderApi__Type__c;
             data.accountType     = gpPos.OrderApi__Account__r.Type;
             data.positionId      = gpPos.Id;
+            Account chapAcct = gpPos.OrderApi__Account__r;
+            if (chapAcct.ParentId != null && provinceIds.contains(chapAcct.ParentId)) {
+                data.provinceId      = chapAcct.ParentId;
+                data.provinceName    = chapAcct.Parent.Name;
+                data.provinceMentors = mentorsByProvince.containsKey(chapAcct.ParentId)
+                    ? mentorsByProvince.get(chapAcct.ParentId) : new List<MentorSummary>();
+            }
+            data.ritualPeers     = ritualPeersByChapter.containsKey(gpPos.OrderApi__Account__c)
+                ? ritualPeersByChapter.get(gpPos.OrderApi__Account__c) : new List<RitualPeerSummary>();
             data.positionNumber  = gpPos.Name;
             data.positionStartDate = gpPos.OrderApi__Start_Date__c;
             String chapStatus = gpPos.OrderApi__Account__r.OrderApi__Chapter_Status__c;

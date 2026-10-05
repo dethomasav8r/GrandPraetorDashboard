@@ -33,8 +33,41 @@
 
         <!-- Chapter Cards -->
         <template if:true={hasChapters}>
+            <template for:each={provinceGroups} for:item="group">
+            <div key={group.key} class="province-section">
+
+                <!-- Province Banner -->
+                <template if:true={group.showBanner}>
+                    <div class="province-banner">
+                        <div class="province-banner-title">
+                            <lightning-icon icon-name="standard:location" size="small"></lightning-icon>
+                            <h2 class="province-name">{group.provinceName} Province</h2>
+                        </div>
+                        <div class="province-mentors-label">Transform Officer Mentors</div>
+                        <template if:true={group.hasMentors}>
+                            <div class="province-mentors-grid">
+                                <template for:each={group.mentors} for:item="mentor">
+                                    <div key={mentor.positionId} class="province-mentor">
+                                        <span class="province-mentor-role">{mentor.role}</span>
+                                        <a onclick={handleContactClick} data-contactid={mentor.contactId} class="province-mentor-name">{mentor.mentorName}</a>
+                                        <template if:true={mentor.phoneLink}>
+                                            <a href={mentor.phoneLink} class="province-mentor-detail">{mentor.phone}</a>
+                                        </template>
+                                        <template if:true={mentor.emailLink}>
+                                            <a href={mentor.emailLink} class="province-mentor-detail">{mentor.email}</a>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        <template if:false={group.hasMentors}>
+                            <p class="province-no-mentors">No active Transform officer mentors for this province.</p>
+                        </template>
+                    </div>
+                </template>
+
             <div class="chapter-grid">
-                <template for:each={dashboardData} for:item="chapter">
+                <template for:each={group.chapters} for:item="chapter">
                     <div key={chapter.chapterId} class="chapter-card">
 
                         <!-- Chapter Header -->
@@ -118,6 +151,14 @@
                                     </template>
                                 </div>
                             </div>
+                            <template if:true={chapter.hasRitualPeers}>
+                                <div class="banner-ritual-row">
+                                    <span class="banner-contact-label">Ritual Peers:</span>
+                                    <template for:each={chapter.ritualPeers} for:item="peer">
+                                        <a key={peer.positionId} onclick={handleContactClick} data-contactid={peer.contactId} class="banner-contact-link banner-ritual-peer">{peer.peerName}</a>
+                                    </template>
+                                </div>
+                            </template>
                             <template if:true={chapter.hasBalance}>
                                 <div class="aging-buckets">
                                     <div class="aging-bucket aging-bucket-0to30 bucket-clickable"
@@ -430,6 +471,8 @@
                     </div>
                 </template>
             </div>
+            </div>
+            </template>
         </template>
 
         <!-- ── 90+ DAY BALANCE ALERT MODAL ── -->

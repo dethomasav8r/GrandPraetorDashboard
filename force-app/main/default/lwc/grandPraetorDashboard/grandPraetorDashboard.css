@@ -782,3 +782,85 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
 .banner-contact-email:hover {
     color: #ffffff;
 }
+
+/* ── Province banner (Transform officer mentors) ── */
+.province-section {
+    margin-bottom: 2rem;
+}
+.province-banner {
+    background: #002B49;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border-left: 6px solid #FEC141;
+}
+.province-banner-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.province-name {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+.province-mentors-label {
+    margin-top: 0.6rem;
+    color: #FEC141;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.province-mentors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.6rem 1.25rem;
+    margin-top: 0.4rem;
+}
+.province-mentor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    font-size: 0.78rem;
+}
+.province-mentor-role {
+    color: rgba(255,255,255,0.70);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.province-mentor-name {
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+.province-mentor-name:hover,
+.province-mentor-detail:hover {
+    text-decoration: underline;
+}
+.province-mentor-detail {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+}
+.province-no-mentors {
+    margin: 0.4rem 0 0;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.7);
+}
+
+/* ── Ritual peers row in chapter banner ── */
+.banner-ritual-row {
+    margin-top: 0.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.2rem 0.75rem;
+    font-size: 0.75rem;
+}
+.banner-ritual-peer {
+    white-space: nowrap;
+}

@@ -6,6 +6,7 @@ import getOrderLines from '@salesforce/apex/GrandPraetorDashboardController.getO
 export default class GrandPraetorDashboard extends LightningElement {
     @track dashboardData = [];
     @track gpInfo = {};
+    @track provinceGroups = [];
 
     get headerGpName()      { return this.gpInfo.gpName      || null; }
     get headerGpEmailLink() { return this.gpInfo.gpEmailLink || null; }
@@ -47,6 +48,7 @@ export default class GrandPraetorDashboard extends LightningElement {
 
                 if (result && result.length > 0 && result[0].chapterId !== 'DEBUG') {
                     this.dashboardData = this.processData(result);
+                    this.provinceGroups = this.buildProvinceGroups(this.dashboardData);
                     const redChapters = this.dashboardData.filter(c => c.hasBalance && c.maxPostedAge >= 60);
                     if (redChapters.length > 0) {
                         this.alertChapters = redChapters;
@@ -54,6 +56,7 @@ export default class GrandPraetorDashboard extends LightningElement {
                     }
                 } else {
                     this.dashboardData = [];
+                    this.provinceGroups = [];
                 }
                 this.isLoading = false;
             })
@@ -213,6 +216,32 @@ export default class GrandPraetorDashboard extends LightningElement {
         return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
+    buildProvinceGroups(chapters) {
+        const groups = [];
+        const byKey = {};
+        chapters.forEach(ch => {
+            const key = ch.provinceId || 'none';
+            if (!byKey[key]) {
+                const mentors = (ch.provinceMentors || []).map(m => ({
+                    ...m,
+                    emailLink: this.isValidEmail(m.email) ? `mailto:${m.email}` : null,
+                    phoneLink: m.phone ? `tel:${m.phone}` : null
+                }));
+                byKey[key] = {
+                    key,
+                    showBanner: !!ch.provinceId,
+                    provinceName: ch.provinceName,
+                    mentors,
+                    hasMentors: mentors.length > 0,
+                    chapters: []
+                };
+                groups.push(byKey[key]);
+            }
+            byKey[key].chapters.push(ch);
+        });
+        return groups;
+    }
+
     processData(rawData) {
         if (!rawData || rawData.length === 0) return [];
         return rawData.map(chapter => {
@@ -269,6 +298,7 @@ export default class GrandPraetorDashboard extends LightningElement {
                 hasMemberEmails: memberEmails.length > 0,
                 memberMailtoLink: memberEmails.length > 0 ? `mailto:${memberEmails.join(',')}` : null,
                 formattedFoundingDate,
+                hasRitualPeers: (chapter.ritualPeers || []).length > 0,
                 gpEmailLink:           this.isValidEmail(chapter.gpEmail) ? `mailto:${chapter.gpEmail}` : null,
                 agpEmailLink:          this.isValidEmail(chapter.agpEmail) ? `mailto:${chapter.agpEmail}` : null,
                 advisorEmailLink:      this.isValidEmail(chapter.advisorEmail) ? `mailto:${chapter.advisorEmail}` : null,
