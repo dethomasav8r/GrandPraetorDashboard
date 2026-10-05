@@ -154,4 +154,42 @@ private class GrandPraetorDashboardControllerTestLive {
             GrandPraetorDashboardController.getOrderLines(gpPos[0].OrderApi__Account__c, '90+');
         System.assertNotEquals(null, lines, 'Should not be null');
     }
+    @isTest
+    static void testProvinceMentorsPopulated() {
+        List<OrderApi__Position__c> mentorPos = [
+            SELECT OrderApi__Account__c
+            FROM OrderApi__Position__c
+            WHERE OrderApi__Role__c LIKE 'Transform%Mentor'
+              AND OrderApi__Status__c = 'Active'
+              AND OrderApi__Account__r.RecordType.Name = 'Province'
+            LIMIT 1
+        ];
+        if (mentorPos.isEmpty()) return;
+
+        List<OrderApi__Position__c> gpPos = [
+            SELECT OrderApi__Contact__c
+            FROM OrderApi__Position__c
+            WHERE OrderApi__Role__c IN ('Grand Praetor', 'Assistant Grand Praetor')
+              AND OrderApi__Status__c = 'Active'
+              AND OrderApi__Account__r.ParentId = :mentorPos[0].OrderApi__Account__c
+            LIMIT 1
+        ];
+        if (gpPos.isEmpty()) return;
+
+        List<GrandPraetorDashboardController.ChapterDashboardData> result =
+            GrandPraetorDashboardController.getDashboardDataForContact(
+                gpPos[0].OrderApi__Contact__c
+            );
+        Boolean found = false;
+        for (GrandPraetorDashboardController.ChapterDashboardData d : result) {
+            if (d.provinceId == String.valueOf(mentorPos[0].OrderApi__Account__c)) {
+                System.assertNotEquals(null, d.provinceName, 'Province name should be set');
+                System.assertNotEquals(null, d.provinceMentors, 'Mentor list should be set');
+                System.assert(!d.provinceMentors.isEmpty(), 'Province should have mentors');
+                System.assertNotEquals(null, d.provinceMentors[0].mentoring, 'Mentoring label should be set');
+                found = true;
+            }
+        }
+        System.assert(found, 'Expected a chapter under the mentored province');
+    }
 }
