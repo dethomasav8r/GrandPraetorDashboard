@@ -151,6 +151,14 @@
                                     </template>
                                 </div>
                             </div>
+                            <template if:true={chapter.hasRitualPeers}>
+                                <div class="banner-ritual-row">
+                                    <span class="banner-contact-label">Ritual Peers:</span>
+                                    <template for:each={chapter.ritualPeers} for:item="peer">
+                                        <a key={peer.positionId} onclick={handleContactClick} data-contactid={peer.contactId} class="banner-contact-link banner-ritual-peer">{peer.peerName}</a>
+                                    </template>
+                                </div>
+                            </template>
                             <template if:true={chapter.hasBalance}>
                                 <div class="aging-buckets">
                                     <div class="aging-bucket aging-bucket-0to30 bucket-clickable"

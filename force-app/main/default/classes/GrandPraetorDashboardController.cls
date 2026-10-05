@@ -47,6 +47,13 @@ public without sharing class GrandPraetorDashboardController {
         @AuraEnabled public String provinceId;
         @AuraEnabled public String provinceName;
         @AuraEnabled public List<MentorSummary> provinceMentors;
+        @AuraEnabled public List<RitualPeerSummary> ritualPeers;
+    }
+
+    public class RitualPeerSummary {
+        @AuraEnabled public String positionId;
+        @AuraEnabled public String peerName;
+        @AuraEnabled public String contactId;
     }
 
     public class MentorSummary {
@@ -387,6 +394,31 @@ public without sharing class GrandPraetorDashboardController {
             for (List<MentorSummary> ml : mentorsByProvince.values()) ml.sort(new MentorComparator());
         }
 
+        // Active Ritual Peers per chapter (a chapter can have several)
+        Map<Id, List<RitualPeerSummary>> ritualPeersByChapter = new Map<Id, List<RitualPeerSummary>>();
+        try {
+            Set<String> seen = new Set<String>();
+            for (OrderApi__Position__c rp : [
+                SELECT Id, OrderApi__Account__c, OrderApi__Contact__c, OrderApi__Contact__r.Name
+                FROM OrderApi__Position__c
+                WHERE OrderApi__Account__c IN :chapterIds
+                  AND OrderApi__Status__c = 'Active'
+                  AND OrderApi__Role__c = 'Ritual Peer'
+                ORDER BY OrderApi__Contact__r.Name ASC
+            ]) {
+                if (rp.OrderApi__Contact__r == null) continue;
+                if (!seen.add(rp.OrderApi__Account__c + '|' + rp.OrderApi__Contact__c)) continue;
+                RitualPeerSummary rs = new RitualPeerSummary();
+                rs.positionId = rp.Id;
+                rs.peerName   = rp.OrderApi__Contact__r.Name;
+                rs.contactId  = rp.OrderApi__Contact__c;
+                if (!ritualPeersByChapter.containsKey(rp.OrderApi__Account__c)) {
+                    ritualPeersByChapter.put(rp.OrderApi__Account__c, new List<RitualPeerSummary>());
+                }
+                ritualPeersByChapter.get(rp.OrderApi__Account__c).add(rs);
+            }
+        } catch(Exception e) { }
+
         // Use helper class to get balance aging buckets
         Map<Id, GrandPraetorBalanceHelper.BalanceResult> balanceMap =
             new Map<Id, GrandPraetorBalanceHelper.BalanceResult>();
@@ -458,6 +490,8 @@ public without sharing class GrandPraetorDashboardController {
                 data.provinceMentors = mentorsByProvince.containsKey(chapAcct.ParentId)
                     ? mentorsByProvince.get(chapAcct.ParentId) : new List<MentorSummary>();
             }
+            data.ritualPeers     = ritualPeersByChapter.containsKey(gpPos.OrderApi__Account__c)
+                ? ritualPeersByChapter.get(gpPos.OrderApi__Account__c) : new List<RitualPeerSummary>();
             data.positionNumber  = gpPos.Name;
             data.positionStartDate = gpPos.OrderApi__Start_Date__c;
             String chapStatus = gpPos.OrderApi__Account__r.OrderApi__Chapter_Status__c;

@@ -192,4 +192,43 @@ private class GrandPraetorDashboardControllerTestLive {
         }
         System.assert(found, 'Expected a chapter under the mentored province');
     }
+    @isTest
+    static void testRitualPeersPopulated() {
+        List<OrderApi__Position__c> peerPos = [
+            SELECT OrderApi__Account__c
+            FROM OrderApi__Position__c
+            WHERE OrderApi__Role__c = 'Ritual Peer'
+              AND OrderApi__Status__c = 'Active'
+              AND OrderApi__Contact__c != null
+            LIMIT 50
+        ];
+        if (peerPos.isEmpty()) return;
+        Set<Id> peerChapters = new Set<Id>();
+        for (OrderApi__Position__c p : peerPos) peerChapters.add(p.OrderApi__Account__c);
+
+        List<OrderApi__Position__c> gpPos = [
+            SELECT OrderApi__Contact__c, OrderApi__Account__c
+            FROM OrderApi__Position__c
+            WHERE OrderApi__Role__c IN ('Grand Praetor', 'Assistant Grand Praetor')
+              AND OrderApi__Status__c = 'Active'
+              AND OrderApi__Account__c IN :peerChapters
+            LIMIT 1
+        ];
+        if (gpPos.isEmpty()) return;
+
+        List<GrandPraetorDashboardController.ChapterDashboardData> result =
+            GrandPraetorDashboardController.getDashboardDataForContact(
+                gpPos[0].OrderApi__Contact__c
+            );
+        Boolean found = false;
+        for (GrandPraetorDashboardController.ChapterDashboardData d : result) {
+            if (d.chapterId == String.valueOf(gpPos[0].OrderApi__Account__c)) {
+                System.assertNotEquals(null, d.ritualPeers, 'Ritual peer list should be set');
+                System.assert(!d.ritualPeers.isEmpty(), 'Chapter should have ritual peers');
+                System.assertNotEquals(null, d.ritualPeers[0].peerName, 'Peer name should be set');
+                found = true;
+            }
+        }
+        System.assert(found, 'Expected the GP chapter in results');
+    }
 }

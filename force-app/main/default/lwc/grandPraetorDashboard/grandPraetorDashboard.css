@@ -851,3 +851,16 @@ a.modal-value:hover { color: #00A3E0; text-decoration: underline; }
     font-size: 0.78rem;
     color: rgba(255,255,255,0.7);
 }
+
+/* ── Ritual peers row in chapter banner ── */
+.banner-ritual-row {
+    margin-top: 0.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.2rem 0.75rem;
+    font-size: 0.75rem;
+}
+.banner-ritual-peer {
+    white-space: nowrap;
+}

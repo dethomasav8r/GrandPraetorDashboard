@@ -298,6 +298,7 @@ export default class GrandPraetorDashboard extends LightningElement {
                 hasMemberEmails: memberEmails.length > 0,
                 memberMailtoLink: memberEmails.length > 0 ? `mailto:${memberEmails.join(',')}` : null,
                 formattedFoundingDate,
+                hasRitualPeers: (chapter.ritualPeers || []).length > 0,
                 gpEmailLink:           this.isValidEmail(chapter.gpEmail) ? `mailto:${chapter.gpEmail}` : null,
                 agpEmailLink:          this.isValidEmail(chapter.agpEmail) ? `mailto:${chapter.agpEmail}` : null,
                 advisorEmailLink:      this.isValidEmail(chapter.advisorEmail) ? `mailto:${chapter.advisorEmail}` : null,
